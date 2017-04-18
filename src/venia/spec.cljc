@@ -12,10 +12,11 @@
 (s/def :venia/query-def (s/cat :query :venia/query-name :args (s/? :venia/args) :fields :venia/fields))
 (s/def :venia/alias keyword?)
 
-(s/def :venia/query-with-meta (s/keys :req [:venia/query-def]
-                                      :opt [:venia/alias]))
+(s/def :venia/advanced-query (s/keys :req [:venia/query-def]
+                                     :opt [:venia/alias]))
 
-(s/def :venia/query (s/coll-of :venia/query-def))
+(s/def :venia/query (s/or :venia/query-vector (s/coll-of :venia/query-def)
+                          :venia/query-with-meta (s/coll-of :venia/advanced-query)))
 
 (defn query->spec [query]
   (s/conform :venia/query query))

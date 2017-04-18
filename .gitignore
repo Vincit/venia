@@ -12,3 +12,4 @@ pom.xml.asc
 *.iml
 doo-index.html
 resources/test
+.idea
