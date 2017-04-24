@@ -50,8 +50,9 @@
        (apply str)))
 
 (defmulti ->query-str (fn [query] (cond (vector? query) (first query)
-                                        (and (map? query)
-                                             (:venia/query-def query)) :venia/query-def
+                                        (and (map? query) (:venia/query-def query)) :venia/query-def
+                                        (and (map? query) (:venia/query-def-with-fragment query)) :venia/query-def-with-fragment
+                                        (and (map? query) (:venia/fragment query)) :venia/fragment
                                         :else :default)))
 
 (defmethod ->query-str :venia/query-vector
@@ -65,11 +66,14 @@
 
 (defmethod ->query-str :venia/query-with-meta
   [[_ query]]
-  (str "{"
-       (->> (map ->query-str query)
-            (interpose ",")
-            (apply str))
-       "}"))
+  (let [has-fragment? (-> query first :venia/fragment)
+        wrapper-start (when-not has-fragment? "{")
+        wrapper-end (when-not has-fragment? "}")]
+    (str wrapper-start
+         (->> (map ->query-str query)
+              (interpose ",")
+              (apply str))
+         wrapper-end)))
 
 (defmethod ->query-str :venia/query-def
   [query]
@@ -79,6 +83,25 @@
         args (when (:args query-def) (str "(" (arguments->str (:args query-def)) ")"))
         fields (str "{" (fields->str (:fields query-def)) "}")]
     (str alias query-str args fields)))
+
+(defmethod ->query-str :venia/query-def-with-fragment
+  [query]
+  (let [query-def (:venia/query-def-with-fragment query)
+        alias (when (:venia/alias query) (str (name (:venia/alias query)) ":"))
+        query-str (name (:query query-def))
+        args (when (:args query-def) (str "(" (arguments->str (:args query-def)) ")"))
+        fragment (str "{" "..." (name (:fragment-name query-def)) "}")]
+    (str alias query-str args fragment)))
+
+(defmethod ->query-str :venia/fragment
+  [fragment]
+  (let [fragment-def (:venia/fragment fragment)
+        fields (str "{" (fields->str (:fragment/fields fragment-def)) "}")]
+    (str "fragment "
+         (name (:fragment/name fragment-def))
+         " on "
+         (name (:fragment/type fragment-def))
+         fields)))
 
 (defmethod ->query-str :default
   [query]
@@ -90,4 +113,6 @@
 (defn graphql-query
   "Formats clojure data structure to valid graphql query string."
   [data]
-  (->query-str (spec/query->spec data)))
+  (->> (map ->query-str (spec/query->spec data))
+       (interpose " ")
+       (apply str)))
