@@ -21,7 +21,8 @@
                                            :venia/alias :venia/fragment]))
 
 (s/def :venia/query-def (s/coll-of (s/or :venia/query-vector (s/coll-of :venia/query)
-                                         :venia/query-map (s/coll-of :venia/advanced-query))))
+                                         :venia/query-map (s/coll-of :venia/advanced-query))
+                                   :min-count 1))
 
 (defn query->spec [query]
   (s/conform :venia/query-def query))
