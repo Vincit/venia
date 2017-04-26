@@ -34,23 +34,23 @@
       (is (= query-str (v/graphql-query data)))))
 
   (testing "Should create a valid graphql string with alias"
-    (let [data [[{:venia/query-def [:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]
-                  :venia/alias     :workhorse}
-                 {:venia/query-def [:employee {:id 2 :active true} [:name :address [:friends [:name :email]]]]
-                  :venia/alias     :boss}]]
+    (let [data [[{:venia/query [:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]
+                  :venia/alias :workhorse}
+                 {:venia/query [:employee {:id 2 :active true} [:name :address [:friends [:name :email]]]]
+                  :venia/alias :boss}]]
           query-str (str "{workhorse:employee(id:1,active:true){name,address,friends{name,email}},"
                          "boss:employee(id:2,active:true){name,address,friends{name,email}}}")]
       (is (= query-str (v/graphql-query data)))))
 
   (testing "Should create a valid graphql query with fragment"
-    (let [data [[{:venia/query-def-with-fragment [:employee
-                                                  {:id 1 :active true}
-                                                  :comparisonFields]
-                  :venia/alias                   :workhorse}
-                 {:venia/query-def-with-fragment [:employee
-                                                  {:id 2 :active true}
-                                                  :comparisonFields]
-                  :venia/alias                   :boss}]
+    (let [data [[{:venia/query-with-fragment [:employee
+                                              {:id 1 :active true}
+                                              :comparisonFields]
+                  :venia/alias               :workhorse}
+                 {:venia/query-with-fragment [:employee
+                                              {:id 2 :active true}
+                                              :comparisonFields]
+                  :venia/alias               :boss}]
                 [{:venia/fragment {:fragment/name   :comparisonFields
                                    :fragment/type   :Worker
                                    :fragment/fields [:name :address [:friends [:name :email]]]}}]]

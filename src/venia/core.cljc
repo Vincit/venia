@@ -50,8 +50,8 @@
        (apply str)))
 
 (defmulti ->query-str (fn [query] (cond (vector? query) (first query)
-                                        (and (map? query) (:venia/query-def query)) :venia/query-def
-                                        (and (map? query) (:venia/query-def-with-fragment query)) :venia/query-def-with-fragment
+                                        (and (map? query) (:venia/query query)) :venia/query
+                                        (and (map? query) (:venia/query-with-fragment query)) :venia/query-with-fragment
                                         (and (map? query) (:venia/fragment query)) :venia/fragment
                                         :else :default)))
 
@@ -64,7 +64,7 @@
             (apply str))
        "}"))
 
-(defmethod ->query-str :venia/query-with-meta
+(defmethod ->query-str :venia/query-map
   [[_ query]]
   (let [has-fragment? (-> query first :venia/fragment)
         wrapper-start (when-not has-fragment? "{")
@@ -75,18 +75,18 @@
               (apply str))
          wrapper-end)))
 
-(defmethod ->query-str :venia/query-def
+(defmethod ->query-str :venia/query
   [query]
-  (let [query-def (:venia/query-def query)
+  (let [query-def (:venia/query query)
         alias (when (:venia/alias query) (str (name (:venia/alias query)) ":"))
         query-str (name (:query query-def))
         args (when (:args query-def) (str "(" (arguments->str (:args query-def)) ")"))
         fields (str "{" (fields->str (:fields query-def)) "}")]
     (str alias query-str args fields)))
 
-(defmethod ->query-str :venia/query-def-with-fragment
+(defmethod ->query-str :venia/query-with-fragment
   [query]
-  (let [query-def (:venia/query-def-with-fragment query)
+  (let [query-def (:venia/query-with-fragment query)
         alias (when (:venia/alias query) (str (name (:venia/alias query)) ":"))
         query-str (name (:query query-def))
         args (when (:args query-def) (str "(" (arguments->str (:args query-def)) ")"))
