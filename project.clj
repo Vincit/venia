@@ -1,6 +1,6 @@
-(defproject venia "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject vincit/venia "0.1.0"
+  :description "Clojure(Script) graphql client"
+  :url "https://github.com/Vincit/venia"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha16" :scope "provided"]
@@ -10,8 +10,8 @@
   :aliases {"test" ["do" "test" ["doo" "once" "phantom" "test"]]}
   :cljsbuild {:builds [{:id           "test"
                         :source-paths ["src" "test"]
-                        :compiler     {:output-to      "resources/test/js/unit-test.js"
-                                       :main           venia.runner
-                                       :optimizations  :none
-                                       :pretty-print   true
-                                       :output-dir     "resources/test/js/gen/out"}}]})
+                        :compiler     {:output-to     "resources/test/js/unit-test.js"
+                                       :main          venia.runner
+                                       :optimizations :none
+                                       :pretty-print  true
+                                       :output-dir    "resources/test/js/gen/out"}}]})
