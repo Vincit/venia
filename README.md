@@ -93,7 +93,7 @@ In the query above, we use `:venia/query` key for query definition and `:venia/a
 What about fragments? Venia supports them as well!
 
 ```clj
-(v/graphqö-query [[{:venia/query-with-fragment [:employee
+(v/graphql-query [[{:venia/query-with-fragment [:employee
                                                 {:id 1 :active true}
                                                 :comparisonFields]
                     :venia/alias               :workhorse}
