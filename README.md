@@ -40,10 +40,10 @@ Do not get shocked by the amount of nested vectors here, venia's structure is ac
 [;; First level
   [;; Second level - collection of query definitions
     [;; Third level - query definiion
-      :employee - object we are fetching
-      {:id 1 :active true} - arguments
-      [:name :address - fields
-      [:friends [:name :email]]] - nested field with children fields
+      :employee ;; - object we are fetching
+      {:id 1 :active true} ;; - arguments
+      [:name :address ;; - fields
+      [:friends [:name :email]]] ;; - nested field with children fields
     ]
   ]
 ]
