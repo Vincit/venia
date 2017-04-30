@@ -4,27 +4,32 @@
        :clj
             [clojure.test :refer :all])))
 
-(def invalid-spec #?(:clj :clojure.spec.alpha/invalid
-                     :cljs :cljs.spec/invalid))
-
 (deftest query->spec-simple-query
   "Simple vector queries"
   (testing "Empty vector, should not be valid"
-    (is (= invalid-spec (vs/query->spec []))))
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec []))))
   (testing "Vector has only query name, should not be valid"
-    (is (= invalid-spec (vs/query->spec [[:queryName]]))))
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec [[:queryName]]))))
   (testing "Vector has only fields, should not be valid"
-    (is (= invalid-spec (vs/query->spec [[[:x :y]]]))))
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec [[[:x :y]]]))))
   (testing "Vector has non-keyword query name, should not be valid"
-    (is (= invalid-spec (vs/query->spec [["queryName" {:id 1} [:x :y]]]))))
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec [["queryName" {:id 1} [:x :y]]]))))
   (testing "Vector has query name and args, but no fields. Should not be valid"
-    (is (= invalid-spec (vs/query->spec [[:queryName {:id 1}]]))))
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec [[:queryName {:id 1}]]))))
   (testing "Vector has args in wrong format, should not be valid"
-    (is (= invalid-spec (vs/query->spec [[:queryName [:id 1] [:x :y]]]))))
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec [[:queryName [:id 1] [:x :y]]]))))
   (testing "Vector has fields in wrong format, should not be valid"
-    (is (= invalid-spec (vs/query->spec [[:queryName {:id 1} {:x :y}]]))))
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec [[:queryName {:id 1} {:x :y}]]))))
   (testing "Inner vector missing, should not be valid"
-    (is (= invalid-spec (vs/query->spec [[:queryName {:id 1} [:x :y]]]))))
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec [[:queryName {:id 1} [:x :y]]]))))
   (testing "Valid vector with single query, should return conformed data"
     (is (= [[:venia/query-vector
              [{:args   {:id 1}

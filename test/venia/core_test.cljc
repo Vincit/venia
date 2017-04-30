@@ -33,6 +33,10 @@
           query-str "{employee(id:1,active:true){name,address,friends{name,email}}}"]
       (is (= query-str (v/graphql-query data)))))
 
+  (testing "Invalid query, should throw exception"
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (v/graphql-query []))))
+
   (testing "Should create a valid graphql string with alias"
     (let [data [[{:venia/query [:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]
                   :venia/alias :workhorse}
