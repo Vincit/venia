@@ -1,5 +1,9 @@
 # venia [wip]
 
+
+[![Clojars Project](https://img.shields.io/clojars/v/vincit/venia.svg)](https://clojars.org/vincit/venia)
+
+
 [![Build Status](https://travis-ci.org/Vincit/venia.svg?branch=master)](https://travis-ci.org/Vincit/venia)
 
 A Clojure(Script) qraphql query client library. Generate valid graphql queries with Clojure data structures.
