@@ -1,5 +1,5 @@
 (ns venia.spec
-  (:require #?(:clj [clojure.spec :as s]
+  (:require #?(:clj [clojure.spec.alpha :as s]
                :cljs [cljs.spec :as s])))
 
 (s/def :venia/query-name keyword?)
