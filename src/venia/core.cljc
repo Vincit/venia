@@ -30,7 +30,7 @@
 #?(:cljs (extend-protocol ArgumentFormatter
            nil
            (arg->str [arg] "")
-           js/String
+           string
            (arg->str [arg] (str "\"" arg "\""))
            PersistentArrayMap
            (arg->str [arg] (str "{" (arguments->str arg) "}"))
@@ -38,7 +38,11 @@
            (arg->str [arg] (str "[" (apply str (interpose "," (map arg->str arg))) "]"))
            Keyword
            (arg->str [arg] (str "\"" (name arg) "\""))
-           js/Object
+           number
+           (arg->str [arg] (str arg))
+           object
+           (arg->str [arg] (str arg))
+           boolean
            (arg->str [arg] (str arg))))
 
 (defn fields->str [fields]
