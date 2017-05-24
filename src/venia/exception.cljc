@@ -8,4 +8,4 @@
 
 #?(:cljs (defmethod throw-ex :venia/spec-validation
            [data]
-           (throw (Error. (str "Invalid query data " data)))))
+           (throw (js/Error. (str "Invalid query data " data)))))
