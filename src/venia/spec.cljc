@@ -5,7 +5,7 @@
 
 (s/def :venia/query-name keyword?)
 (s/def :venia/fields (s/coll-of (s/or :venia/field keyword?
-                                      :venia/nested-field (s/cat :venia/nested-field-root keyword? :venia/nested-field-children :venia/fields))))
+                                      :venia/nested-field (s/cat :venia/nested-field-root keyword? :args (s/? :venia/args) :venia/nested-field-children :venia/fields))))
 (s/def :venia/args (s/keys :opt [:venia/alias]))
 (s/def :venia/query (s/cat :query :venia/query-name :args (s/? :venia/args) :fields :venia/fields))
 (s/def :venia/query-with-fragment (s/cat :query :venia/query-name :args (s/? :venia/args) :fragment-name keyword?))

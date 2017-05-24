@@ -33,6 +33,11 @@
           query-str "{employee(id:1,active:true){name,address,friends{name,email}}}"]
       (is (= query-str (v/graphql-query data)))))
 
+  (testing "Should create a valid graphql string using params on nested fields."
+    (let [data [[[:employee {:id 1 :active true} [:name :address [:friends {:id 1} [:name :email]]]]]]
+          query-str "{employee(id:1,active:true){name,address,friends(id:1){name,email}}}"]
+      (is (= query-str (v/graphql-query data)))))
+
   (testing "Invalid query, should throw exception"
     (is (thrown? #?(:clj  Exception
                     :cljs js/Error) (v/graphql-query []))))
