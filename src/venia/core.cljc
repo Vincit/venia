@@ -49,7 +49,7 @@
   (->> (for [[type value] fields]
          (condp = type
            :venia/field (name value)
-           :venia/nested-field (str (name (:venia/nested-field-root value)) "{" (fields->str (:venia/nested-field-children value)) "}")))
+           :venia/nested-field (str (name (:venia/nested-field-root value)) (when (:args value) (str "(" (arguments->str (:args value)) ")")) "{" (fields->str (:venia/nested-field-children value)) "}")))
        (interpose ",")
        (apply str)))
 
