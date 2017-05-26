@@ -15,7 +15,7 @@
 
 #?(:clj (extend-protocol ArgumentFormatter
           nil
-          (arg->str [arg] "")
+          (arg->str [arg] "null")
           String
           (arg->str [arg] (str "\"" arg "\""))
           IPersistentMap
@@ -29,7 +29,7 @@
 
 #?(:cljs (extend-protocol ArgumentFormatter
            nil
-           (arg->str [arg] "")
+           (arg->str [arg] "null")
            string
            (arg->str [arg] (str "\"" arg "\""))
            PersistentArrayMap
