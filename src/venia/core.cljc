@@ -70,9 +70,9 @@
 (defmulti ->query-str
   (fn [query]
     (cond (vector? query) (first query)
-          (and (map? query) (:venia/query query)) :venia/query
-          (and (map? query) (:venia/query-with-fragment query)) :venia/query-with-fragment
-          (and (map? query) (:venia/fragment query)) :venia/fragment
+          (:venia/query query) :venia/query
+          (:venia/query-with-fragment query) :venia/query-with-fragment
+          (:venia/fragment query) :venia/fragment
           :else :default)))
 
 (defmethod ->query-str :venia/query-vector
