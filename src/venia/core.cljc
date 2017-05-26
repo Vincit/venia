@@ -4,9 +4,15 @@
      (:import (clojure.lang IPersistentMap Keyword IPersistentCollection))))
 
 (defprotocol ArgumentFormatter
+  "Protocol responsible for query arguments' formatting to string.
+  Has separate implementations for general data types in cljs and clj."
   (arg->str [arg]))
 
-(defn arguments->str [args]
+(defn arguments->str
+  "Given a map of query arguments, formats them and concatenates to string.
+
+  E.g. (arguments->str {:id 1 :type \"human\"}) => id:1,type:\"human\""
+  [args]
   (->> (for [[k v] args]
          [(name k) ":" (arg->str v)])
        (interpose ",")
@@ -45,7 +51,10 @@
            boolean
            (arg->str [arg] (str arg))))
 
-(defn fields->str [fields]
+(defn fields->str
+  "Given a spec conformed vector of query fields (and possibly nested fields),
+  concatenates them to string, keeping nested structures intact."
+  [fields]
   (->> (for [[type value] fields]
          (condp = type
            :venia/field (name value)
@@ -66,7 +75,7 @@
 
 (defmethod ->query-str :venia/query-vector
   [[_ query]]
-  "Given a spec conformed query map, creats query string with query, arguments and fields."
+  "Given a spec conformed query vector, creates query string with query, arguments and fields."
   (str "{"
        (->> (map ->query-str query)
             (interpose ",")
@@ -75,6 +84,7 @@
 
 (defmethod ->query-str :venia/query-map
   [[_ query]]
+  "Given a spec conformed query map, creates query string with query, arguments and fields."
   (let [has-fragment? (-> query first :venia/fragment)
         wrapper-start (when-not has-fragment? "{")
         wrapper-end (when-not has-fragment? "}")]
@@ -86,6 +96,7 @@
 
 (defmethod ->query-str :venia/query
   [query]
+  "Processes a single query."
   (let [query-def (:venia/query query)
         alias (when (:venia/alias query) (str (name (:venia/alias query)) ":"))
         query-str (name (:query query-def))
@@ -95,6 +106,7 @@
 
 (defmethod ->query-str :venia/query-with-fragment
   [query]
+  "Processes a single query with defined fragment."
   (let [query-def (:venia/query-with-fragment query)
         alias (when (:venia/alias query) (str (name (:venia/alias query)) ":"))
         query-str (name (:query query-def))
@@ -104,6 +116,7 @@
 
 (defmethod ->query-str :venia/fragment
   [fragment]
+  "Processes a single fragment definition."
   (let [fragment-def (:venia/fragment fragment)
         fields (str "{" (fields->str (:fragment/fields fragment-def)) "}")]
     (str "fragment "
@@ -114,6 +127,7 @@
 
 (defmethod ->query-str :default
   [query]
+  "Processes simple query."
   (let [query-str (name (:query query))
         args (when (:args query) (str "(" (arguments->str (:args query)) ")"))
         fields (str "{" (fields->str (:fields query)) "}")]
