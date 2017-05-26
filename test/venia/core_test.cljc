@@ -5,9 +5,10 @@
             [clojure.test :refer :all])))
 
 (deftest ArgumentFormatter-test
-  (is (= "" (v/arg->str nil)))
+  (is (= "null" (v/arg->str nil)))
   (is (= "\"human\"" (v/arg->str "human")))
   (is (= "{id:1}" (v/arg->str {:id 1})))
+  (is (= "{id:null}" (v/arg->str {:id nil})))
   (is (= "[1,2,3]" (v/arg->str [1 2 3])))
   (is (= "[1,{id:1},\"human\"]" (v/arg->str [1 {:id 1} "human"])))
   (is (= "\"human\"" (v/arg->str :human)))
@@ -17,6 +18,7 @@
 (deftest arguments->str-test
   (is (= "" (v/arguments->str {})))
   (is (= "id:1" (v/arguments->str {:id 1})))
+  (is (= "id:null" (v/arguments->str {:id nil})))
   (is (= "id:1,type:\"human\"" (v/arguments->str {:id 1 :type "human"})))
   (is (= "id:1,vector:[1,2,3]" (v/arguments->str {:id 1 :vector [1 2 3]}))))
 
