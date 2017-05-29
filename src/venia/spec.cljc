@@ -24,13 +24,10 @@
 (s/def :venia/query-def (s/coll-of (s/or :venia/query-vector (s/coll-of :venia/query)
                                          :venia/query-map (s/coll-of :venia/advanced-query))
                                    :min-count 1))
-(defn- invalid? [data]
-  (= #?(:clj  :clojure.spec.alpha/invalid
-        :cljs :cljs.spec/invalid) data))
 
 (defn query->spec [query]
   (let [conformed (s/conform :venia/query-def query)]
-    (if (invalid? conformed)
+    (if (= ::s/invalid conformed)
       (ex/throw-ex {:venia/ex-type    :venia/spec-validation
                     :venia/ex-explain (s/explain :venia/query-def query)})
       conformed)))
