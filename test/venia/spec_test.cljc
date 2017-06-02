@@ -31,25 +31,52 @@
     (is (thrown? #?(:clj  Exception
                     :cljs js/Error) (vs/query->spec [[:queryName {:id 1} [:x :y]]]))))
   (testing "Valid vector with single query, should return conformed data"
-    (is (= [[:venia/query-vector
-             [{:args   {:id 1}
-               :fields [[:venia/field
-                         :x]
-                        [:venia/field
-                         :y]]
-               :query  :queryName}]]] (vs/query->spec [[[:queryName {:id 1} [:x :y]]]]))))
-  (testing "Valid vector with two queries, should return conformed data"
-    (is (= [[:venia/query-vector
-             [{:args   {:id 1}
-               :fields [[:venia/field
-                         :x]
-                        [:venia/field
-                         :y]]
-               :query  :queryName}
-              {:args   {:name "abc"}
-               :fields [[:venia/field
-                         :i]
-                        [:venia/field
-                         :k]]
-               :query  :otherQuery}]]] (vs/query->spec [[[:queryName {:id 1} [:x :y]]
-                                                         [:otherQuery {:name "abc"} [:i :k]]]])))))
+    (is (= [:venia/query-def {:venia/queries [[:query/data {:query  :employee
+                                                            :args   {:id 1 :active true}
+                                                            :fields [[:venia/field :name] [:venia/field :address]
+                                                                     [:venia/nested-field {:venia/nested-field-root     :friends
+                                                                                           :venia/nested-field-children [[:venia/field :name]
+                                                                                                                         [:venia/field :email]]}]]}]]}]
+           (vs/query->spec {:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]}))))
+  (testing "Valid vector with all possible data, should return conformed data"
+    (is (= [:venia/query-def {:venia/operation      :query
+                              :venia/operation-name "employeeQuery"
+                              :venia/variables      [{:variable/name "id"
+                                                      :variable/type :Int}
+                                                     {:variable/name "name"
+                                                      :variable/type :String}]
+                              :venia/fragments      [{:fragment/name   :comparisonFields
+                                                      :fragment/type   :Worker
+                                                      :fragment/fields [[:venia/field :name] [:venia/field :address]
+                                                                        [:venia/nested-field {:venia/nested-field-root     :friends
+                                                                                              :venia/nested-field-children [[:venia/field :name]
+                                                                                                                            [:venia/field :email]]}]]}]
+                              :venia/queries        [[:venia/query-with-data {:query/data  {:query  :employee
+                                                                                            :args   {:id     :$id
+                                                                                                     :active true
+                                                                                                     :name   :$name}
+                                                                                            :fields :fragment/comparisonFields}
+                                                                              :query/alias :workhorse}]
+                                                     [:venia/query-with-data {:query/data  {:query  :employee
+                                                                                            :args   {:id     :$id
+                                                                                                     :active false}
+                                                                                            :fields :fragment/comparisonFields}
+                                                                              :query/alias :boss}]]}]
+           (vs/query->spec {:venia/operation      :query
+                            :venia/operation-name "employeeQuery"
+                            :venia/variables      [{:variable/name "id"
+                                                    :variable/type :Int}
+                                                   {:variable/name "name"
+                                                    :variable/type :String}]
+                            :venia/queries        [{:query/data  [:employee {:id     :$id
+                                                                             :active true
+                                                                             :name   :$name}
+                                                                  :fragment/comparisonFields]
+                                                    :query/alias :workhorse}
+                                                   {:query/data  [:employee {:id     :$id
+                                                                             :active false}
+                                                                  :fragment/comparisonFields]
+                                                    :query/alias :boss}]
+                            :venia/fragments      [{:fragment/name   :comparisonFields
+                                                    :fragment/type   :Worker
+                                                    :fragment/fields [:name :address [:friends [:name :email]]]}]})))))

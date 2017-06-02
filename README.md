@@ -29,49 +29,29 @@ The easiest way to start with venia, is simple's query generation.
 (ns my.project
   (:require [venia.core :as v]))
 
-(v/graphql-query [[[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]])
+{:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]}
 
 => "{employee(id:1,active:true){name,address,friends{name,email}}}"
 ```
 
-Do not get shocked by the amount of nested vectors here, venia's structure is actually pretty simple:
+Obviously, If we would like to fetch employees and projects within the same simple query, we would do it this way:
 
 ```clj
-[;; First level
-  [;; Second level - collection of query definitions
-    [;; Third level - query definiion
-      :employee ;; - object we are fetching
-      {:id 1 :active true} ;; - arguments
-      [:name :address ;; - fields
-      [:friends [:name :email]]] ;; - nested field with children fields
-    ]
-  ]
-]
-```
-
-If we would like to fetch employees and projects within the same simple query, we would do it this way:
-
-```clj
-(v/graphql-query [;; First level
-                   [;; Second level
-                     [:employee {:active true} [:name :address]]
-                     [:project {:active true} [:customer :price]]
-                   ]
-                 ])
+(v/graphql-query {:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]
+                                  [:projects {:active true} [:customer :price]]]})
 
 => "{employee(active:true){name,address},project(active:true){customer,price}}"
 ```
 
 ### Query with alias
 
-Now, if we need to have an alias for query, it can be easily achieved by using venia's map query definition:
+Now, if we need to have an alias for query, it can be easily achieved by using venia's query-with-data map
 
 ```clj
-(v/graphql-query
-  [[{:venia/query [:employee {:id 1 :active true} [:name :address]]
-     :venia/alias :workhorse}
-    {:venia/query [:employee {:id 2 :active true} [:name :address]]
-     :venia/alias :boss}]])
+(v/graphql-query {:venia/queries [{:query/data [:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]
+                                   :query/alias :workhorse}
+                                  {:query/data  [:employee {:id 2 :active true} [:name :address [:friends [:name :email]]]]
+                                   :query/alias :boss}]})
      
 => prettified:
 {
@@ -86,24 +66,20 @@ Now, if we need to have an alias for query, it can be easily achieved by using v
 }
 ```
 
-In the query above, we use `:venia/query` key for query definition and `:venia/alias` for query's alias definition.
+In the query above, we use `:query/data` key for query definition and `:query/alias` for query's alias definition.
 
 ### Query with fragments
 
-What about fragments? Venia supports them as well!
+What about fragments? Just add `:venia/fragments` vector with fragments definitions
 
 ```clj
-(v/graphql-query [[{:venia/query-with-fragment [:employee
-                                                {:id 1 :active true}
-                                                :comparisonFields]
-                    :venia/alias               :workhorse}
-                   {:venia/query-with-fragment [:employee
-                                                {:id 2 :active true}
-                                                :comparisonFields]
-                    :venia/alias               :boss}]
-                  [{:venia/fragment {:fragment/name   :comparisonFields
+(v/graphql-query {:venia/queries   [{:query/data  [:employee {:id 1 :active true} :fragment/comparisonFields]
+                                     :query/alias :workhorse}
+                                    {:query/data  [:employee {:id 2 :active true} :fragment/comparisonFields]
+                                     :query/alias :boss}]
+                  :venia/fragments [{:fragment/name   :comparisonFields
                                      :fragment/type   :Worker
-                                     :fragment/fields [:name :address]}}]])
+                                     :fragment/fields [:name :address]}]})
 
 => prettified:
 {
@@ -121,8 +97,52 @@ fragment comparisonFields on Worker {
 }
 ```
 
-This time, query is defined with `venia/query-with-fragment`, where we use a keyword instead of vector of fields.
-Fragment itself is defined inside of separate from query definitions vector as `venia/fragment`.
+### Query with variables
+
+Now you can generate really complex queries with variables as well. In order to define variables, we need to define 
+an operation type and name. Notice, currently on `:query` operations are supported.
+
+
+```clj
+(v/graphql-query {:venia/operation      :query
+                  :venia/operation-name "employeeQuery"
+                  :venia/variables      [{:variable/name "id"
+                                          :variable/type :Int}
+                                         {:variable/name "name"
+                                          :variable/type :String}]
+                  :venia/queries        [{:query/data  [:employee {:id     :$id
+                                                                   :active true
+                                                                   :name   :$name}
+                                                        :fragment/comparisonFields]
+                                          :query/alias :workhorse}
+                                         {:query/data  [:employee {:id     :$id
+                                                                   :active false}
+                                                        :fragment/comparisonFields]
+                                          :query/alias :boss}]
+                  :venia/fragments      [{:fragment/name   :comparisonFields
+                                          :fragment/type   :Worker
+                                          :fragment/fields [:name :address [:friends [:name :email]]]}]})
+
+=> prettified:
+query employeeQuery($id: Int, $name: String) {
+  workhorse: employee(id: $id, active: true, name: $name) {
+    ...comparisonFields
+  }
+  boss: employee(id: $id, active: false) {
+    ...comparisonFields
+  }
+}
+
+fragment comparisonFields on Worker {
+  name
+  address
+  friends {
+    name
+    email
+  }
+}
+
+```
 
 ## License
 
