@@ -77,7 +77,7 @@ What about fragments? Just add `:venia/fragments` vector with fragments definiti
                                      :query/alias :workhorse}
                                     {:query/data  [:employee {:id 2 :active true} :fragment/comparisonFields]
                                      :query/alias :boss}]
-                  :venia/fragments [{:fragment/name   :comparisonFields
+                  :venia/fragments [{:fragment/name   "comparisonFields"
                                      :fragment/type   :Worker
                                      :fragment/fields [:name :address]}]})
 
@@ -119,7 +119,7 @@ an operation type and name. Notice, currently on `:query` operations are support
                                                               :active false}
                                                    :fragment/comparisonFields]
                                      :query/alias :boss}]
-                  :venia/fragments [{:fragment/name   :comparisonFields
+                  :venia/fragments [{:fragment/name   "comparisonFields"
                                      :fragment/type   :Worker
                                      :fragment/fields [:name :address [:friends [:name :email]]]}]})
 

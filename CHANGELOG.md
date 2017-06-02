@@ -27,7 +27,7 @@ Now, queries are defined like this:
                                              :active false}
                                   :fragment/comparisonFields]
                     :query/alias :boss}]
- :venia/fragments [{:fragment/name   :comparisonFields
+ :venia/fragments [{:fragment/name   "comparisonFields"
                     :fragment/type   :Worker
                     :fragment/fields [:name :address [:friends [:name :email]]]}]}
 ```

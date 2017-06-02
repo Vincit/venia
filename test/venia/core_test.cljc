@@ -41,7 +41,7 @@
 
 (deftest fragment->str-test
   (is (= "fragment comparisonFields on Worker{name,address,friends{name,email}}"
-         (v/fragment->str {:fragment/name   :comparisonFields
+         (v/fragment->str {:fragment/name   "comparisonFields"
                            :fragment/type   :Worker
                            :fragment/fields [[:venia/field :name] [:venia/field :address]
                                              [:venia/nested-field {:venia/nested-field-root     :friends
@@ -78,7 +78,7 @@
                                    :query/alias :workhorse}
                                   {:query/data  [:employee {:id 2 :active true} :fragment/comparisonFields]
                                    :query/alias :boss}]
-                :venia/fragments [{:fragment/name   :comparisonFields
+                :venia/fragments [{:fragment/name   "comparisonFields"
                                    :fragment/type   :Worker
                                    :fragment/fields [:name :address [:friends [:name :email]]]}]}
           query-str (str "{workhorse:employee(id:1,active:true){...comparisonFields},boss:employee(id:2,active:true){...comparisonFields}} "
@@ -91,10 +91,10 @@
                                    :query/alias :workhorse}
                                   {:query/data  [:employee {:id 2 :active true} :fragment/comparisonFields]
                                    :query/alias :boss}]
-                :venia/fragments [{:fragment/name   :comparisonFields
+                :venia/fragments [{:fragment/name   "comparisonFields"
                                    :fragment/type   :Worker
                                    :fragment/fields [:name :address [:friends [:name :email]]]}
-                                  {:fragment/name   :secondFragment
+                                  {:fragment/name   "secondFragment"
                                    :fragment/type   :Worker
                                    :fragment/fields [:name]}]}
           query-str (str "{workhorse:employee(id:1,active:true){...comparisonFields},boss:employee(id:2,active:true){...comparisonFields}} "
@@ -134,7 +134,7 @@
                                                             :active false}
                                                  :fragment/comparisonFields]
                                    :query/alias :boss}]
-                :venia/fragments [{:fragment/name   :comparisonFields
+                :venia/fragments [{:fragment/name   "comparisonFields"
                                    :fragment/type   :Worker
                                    :fragment/fields [:name :address [:friends [:name :email]]]}]}
           query-str (str "query employeeQuery($id:Int,$name:String){workhorse:employee(id:$id,active:true,name:$name){...comparisonFields},"

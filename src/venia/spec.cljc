@@ -30,7 +30,7 @@
                                                          :opt [:query/alias])))
 (s/def :query/alias keyword?)
 
-(s/def :fragment/name keyword?)
+(s/def :fragment/name string?)
 (s/def :fragment/type keyword?)
 (s/def :fragment/fields :venia/fields)
 (s/def :venia/fragment (s/keys :req [:fragment/name :fragment/type :fragment/fields]))
