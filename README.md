@@ -104,24 +104,24 @@ an operation type and name. Notice, currently on `:query` operations are support
 
 
 ```clj
-(v/graphql-query {:venia/operation      :query
-                  :venia/operation-name "employeeQuery"
-                  :venia/variables      [{:variable/name "id"
-                                          :variable/type :Int}
-                                         {:variable/name "name"
-                                          :variable/type :String}]
-                  :venia/queries        [{:query/data  [:employee {:id     :$id
-                                                                   :active true
-                                                                   :name   :$name}
-                                                        :fragment/comparisonFields]
-                                          :query/alias :workhorse}
-                                         {:query/data  [:employee {:id     :$id
-                                                                   :active false}
-                                                        :fragment/comparisonFields]
-                                          :query/alias :boss}]
-                  :venia/fragments      [{:fragment/name   :comparisonFields
-                                          :fragment/type   :Worker
-                                          :fragment/fields [:name :address [:friends [:name :email]]]}]})
+(v/graphql-query {:venia/operation {:operation/type :query
+                                    :operation/name "employeeQuery"}
+                  :venia/variables [{:variable/name "id"
+                                     :variable/type :Int}
+                                    {:variable/name "name"
+                                     :variable/type :String}]
+                  :venia/queries   [{:query/data  [:employee {:id     :$id
+                                                              :active true
+                                                              :name   :$name}
+                                                   :fragment/comparisonFields]
+                                     :query/alias :workhorse}
+                                    {:query/data  [:employee {:id     :$id
+                                                              :active false}
+                                                   :fragment/comparisonFields]
+                                     :query/alias :boss}]
+                  :venia/fragments [{:fragment/name   :comparisonFields
+                                     :fragment/type   :Worker
+                                     :fragment/fields [:name :address [:friends [:name :email]]]}]})
 
 => prettified:
 query employeeQuery($id: Int, $name: String) {

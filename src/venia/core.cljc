@@ -109,8 +109,7 @@
   [[_ query]]
   "Given a spec conformed root query map, creates a complete query string."
   (let [operation (:venia/operation query)
-        operation-name (:venia/operation-name query)
-        operation-with-name (when (and operation operation-name) (str (name operation) " " operation-name))
+        operation-with-name (when operation (str (name (:operation/type operation)) " " (:operation/name operation)))
         variables (:venia/variables query)
         variables-str (when variables (str "(" (variables->str variables) ")"))
         fragments (:venia/fragments query)

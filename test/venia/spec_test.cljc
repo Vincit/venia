@@ -39,44 +39,44 @@
                                                                                                                          [:venia/field :email]]}]]}]]}]
            (vs/query->spec {:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]}))))
   (testing "Valid vector with all possible data, should return conformed data"
-    (is (= [:venia/query-def {:venia/operation      :query
-                              :venia/operation-name "employeeQuery"
-                              :venia/variables      [{:variable/name "id"
-                                                      :variable/type :Int}
-                                                     {:variable/name "name"
-                                                      :variable/type :String}]
-                              :venia/fragments      [{:fragment/name   :comparisonFields
-                                                      :fragment/type   :Worker
-                                                      :fragment/fields [[:venia/field :name] [:venia/field :address]
-                                                                        [:venia/nested-field {:venia/nested-field-root     :friends
-                                                                                              :venia/nested-field-children [[:venia/field :name]
-                                                                                                                            [:venia/field :email]]}]]}]
-                              :venia/queries        [[:venia/query-with-data {:query/data  {:query  :employee
-                                                                                            :args   {:id     :$id
-                                                                                                     :active true
-                                                                                                     :name   :$name}
-                                                                                            :fields :fragment/comparisonFields}
-                                                                              :query/alias :workhorse}]
-                                                     [:venia/query-with-data {:query/data  {:query  :employee
-                                                                                            :args   {:id     :$id
-                                                                                                     :active false}
-                                                                                            :fields :fragment/comparisonFields}
-                                                                              :query/alias :boss}]]}]
-           (vs/query->spec {:venia/operation      :query
-                            :venia/operation-name "employeeQuery"
-                            :venia/variables      [{:variable/name "id"
-                                                    :variable/type :Int}
-                                                   {:variable/name "name"
-                                                    :variable/type :String}]
-                            :venia/queries        [{:query/data  [:employee {:id     :$id
-                                                                             :active true
-                                                                             :name   :$name}
-                                                                  :fragment/comparisonFields]
-                                                    :query/alias :workhorse}
-                                                   {:query/data  [:employee {:id     :$id
-                                                                             :active false}
-                                                                  :fragment/comparisonFields]
-                                                    :query/alias :boss}]
-                            :venia/fragments      [{:fragment/name   :comparisonFields
-                                                    :fragment/type   :Worker
-                                                    :fragment/fields [:name :address [:friends [:name :email]]]}]})))))
+    (is (= [:venia/query-def {:venia/operation {:operation/type :query
+                                                :operation/name "employeeQuery"}
+                              :venia/variables [{:variable/name "id"
+                                                 :variable/type :Int}
+                                                {:variable/name "name"
+                                                 :variable/type :String}]
+                              :venia/fragments [{:fragment/name   :comparisonFields
+                                                 :fragment/type   :Worker
+                                                 :fragment/fields [[:venia/field :name] [:venia/field :address]
+                                                                   [:venia/nested-field {:venia/nested-field-root     :friends
+                                                                                         :venia/nested-field-children [[:venia/field :name]
+                                                                                                                       [:venia/field :email]]}]]}]
+                              :venia/queries   [[:venia/query-with-data {:query/data  {:query  :employee
+                                                                                       :args   {:id     :$id
+                                                                                                :active true
+                                                                                                :name   :$name}
+                                                                                       :fields :fragment/comparisonFields}
+                                                                         :query/alias :workhorse}]
+                                                [:venia/query-with-data {:query/data  {:query  :employee
+                                                                                       :args   {:id     :$id
+                                                                                                :active false}
+                                                                                       :fields :fragment/comparisonFields}
+                                                                         :query/alias :boss}]]}]
+           (vs/query->spec {:venia/operation {:operation/type :query
+                                              :operation/name "employeeQuery"}
+                            :venia/variables [{:variable/name "id"
+                                               :variable/type :Int}
+                                              {:variable/name "name"
+                                               :variable/type :String}]
+                            :venia/queries   [{:query/data  [:employee {:id     :$id
+                                                                        :active true
+                                                                        :name   :$name}
+                                                             :fragment/comparisonFields]
+                                               :query/alias :workhorse}
+                                              {:query/data  [:employee {:id     :$id
+                                                                        :active false}
+                                                             :fragment/comparisonFields]
+                                               :query/alias :boss}]
+                            :venia/fragments [{:fragment/name   :comparisonFields
+                                               :fragment/type   :Worker
+                                               :fragment/fields [:name :address [:friends [:name :email]]]}]})))))

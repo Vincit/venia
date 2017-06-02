@@ -36,8 +36,9 @@
 (s/def :venia/fragment (s/keys :req [:fragment/name :fragment/type :fragment/fields]))
 (s/def :venia/fragments (s/coll-of :venia/fragment :min-count 1))
 
-(s/def :venia/operation #{:query})
-(s/def :venia/operation-name string?)
+(s/def :operation/type #{:query})
+(s/def :operation/name string?)
+(s/def :venia/operation (s/keys :req [:operation/type :operation/name]))
 
 (s/def :variable/name string?)
 (s/def :variable/type keyword?)
@@ -48,7 +49,7 @@
 
 (s/def :venia/query-def (s/keys :req [:venia/queries]
                                 :opt [:venia/fragments
-                                      :venia/operation :venia/operation-name
+                                      :venia/operation
                                       :venia/variables]))
 
 (defn query->spec [query]
