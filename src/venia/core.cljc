@@ -108,8 +108,7 @@
 (defmethod ->query-str :venia/query-def
   [[_ query]]
   "Given a spec conformed root query map, creates a complete query string."
-  (let [has-fragment? (:venia/fragment query)
-        operation (:venia/operation query)
+  (let [operation (:venia/operation query)
         operation-name (:venia/operation-name query)
         operation-with-name (when (and operation operation-name) (str (name operation) " " operation-name))
         variables (:venia/variables query)
