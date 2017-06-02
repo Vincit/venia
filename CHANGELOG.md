@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## 0.2.1 (Unreleased)
+## 0.2.1 - 2017-06-02
 ### Added 
 - Support for variables
 
