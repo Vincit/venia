@@ -17,11 +17,17 @@
   (second (s/conform spec x)))
 
 (s/def :venia/query-name keyword?)
-(s/def :venia/fields (s/conformer #(or-conformer % (s/or :fields (s/coll-of (s/or :venia/field keyword?
-                                                                                  :venia/nested-field (s/cat :venia/nested-field-root keyword?
-                                                                                                             :args (s/? :venia/args)
-                                                                                                             :venia/nested-field-children :venia/fields)))
-                                                         :fragment fragment-keyword?))))
+(s/def :venia/fields
+  (s/conformer
+    #(or-conformer %
+                   (s/or :fields
+                         (s/coll-of (s/or :venia/field keyword?
+                                          :venia/nested-field-arg-only (s/cat :venia/nested-field-root keyword?
+                                                                         :args :venia/args)
+                                          :venia/nested-field (s/cat :venia/nested-field-root keyword?
+                                                                :args (s/? :venia/args)
+                                                                :venia/nested-field-children :venia/fields)))
+                         :fragment fragment-keyword?))))
 
 (s/def :venia/args (s/keys :opt []))
 (s/def :query/data (s/cat :query :venia/query-name :args (s/? :venia/args) :fields :venia/fields))
