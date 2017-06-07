@@ -65,7 +65,9 @@
                                         (str "(" (arguments->str (:args value)) ")"))
                                       "{"
                                       (fields->str (:venia/nested-field-children value))
-                                      "}")))
+                                      "}")
+             :venia/nested-field-arg-only (str (name (:venia/nested-field-root value))
+                                            (str "(" (arguments->str (:args value)) ")"))))
          (interpose ",")
          (apply str))))
 
