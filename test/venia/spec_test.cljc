@@ -71,6 +71,18 @@
     (is (thrown? #?(:clj  Exception
                     :cljs js/Error) (vs/query->spec {:venia/variables [{:variable/name "name"}]
                                                      :venia/queries   [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]}))))
+  (testing "Invalid fragment is used in query definition, should throw exception"
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec {:venia/queries   [[:employee {:id 1 :active true} :fragment/invalid]]
+                                                     :venia/fragments [{:fragment/name   "comparisonFields"
+                                                                        :fragment/type   :Worker
+                                                                        :fragment/fields [[:venia/field :name] [:venia/field :address]
+                                                                                          [:venia/nested-field {:venia/nested-field-root     :friends
+                                                                                                                :venia/nested-field-children [[:venia/field :name]
+                                                                                                                                              [:venia/field :email]]}]]}]}))))
+  (testing "Undefined fragments are used in query definition, should throw exception"
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec {:venia/queries   [[:employee {:id 1 :active true} :fragment/undefined]]}))))
   (testing "Valid vector with all possible data, should return conformed data"
     (is (= [:venia/query-def {:venia/operation {:operation/type :query
                                                 :operation/name "employeeQuery"}

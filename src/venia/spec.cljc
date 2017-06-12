@@ -1,7 +1,8 @@
 (ns venia.spec
   (:require #?(:clj [clojure.spec.alpha :as s]
                :cljs [cljs.spec.alpha :as s])
-                    [venia.exception :as ex]))
+                    [venia.exception :as ex]
+                    [clojure.set :as c-set]))
 
 (defn- fragment-keyword?
   "Checks if keyword has :fragment namespace"
@@ -16,6 +17,43 @@
   [x spec]
   (second (s/conform spec x)))
 
+(defn- extract-fragments-name [query]
+  (let [fields (or (get-in query [:query/data :fields]) (:fields query))]
+    (if (keyword? fields)
+      (name fields)
+      nil)))
+
+(defn- resolve-used-fragments
+  [x]
+  (->> x
+       :venia/queries
+       (map #(-> %
+                 second
+                 extract-fragments-name))
+       (remove nil?)
+       set))
+
+(defn- valid-fragments
+  "Checks that all fragments used in queries are actually defined"
+  [x]
+  (if-not (:venia/fragments x)
+    (let [used-fragments (resolve-used-fragments x)]
+      (if-not (empty? used-fragments)
+        (ex/throw-ex {:venia/ex-type :venia/invalid-fragments
+                      :venia/ex-data used-fragments})
+        x))
+
+    (let [fragment-names (->> x
+                              :venia/fragments
+                              (map :fragment/name)
+                              set)
+          used-fragments (resolve-used-fragments x)
+          undefined-fragments (c-set/difference used-fragments fragment-names)]
+      (if (empty? undefined-fragments)
+        x
+        (ex/throw-ex {:venia/ex-type :venia/invalid-fragments
+                      :venia/ex-data undefined-fragments})))))
+
 (s/def :venia/query-name keyword?)
 (s/def :venia/fields
   (s/conformer
@@ -23,10 +61,10 @@
                    (s/or :fields
                          (s/coll-of (s/or :venia/field keyword?
                                           :venia/nested-field-arg-only (s/cat :venia/nested-field-root keyword?
-                                                                         :args :venia/args)
+                                                                              :args :venia/args)
                                           :venia/nested-field (s/cat :venia/nested-field-root keyword?
-                                                                :args (s/? :venia/args)
-                                                                :venia/nested-field-children :venia/fields)))
+                                                                     :args (s/? :venia/args)
+                                                                     :venia/nested-field-children :venia/fields)))
                          :fragment fragment-keyword?))))
 
 (s/def :venia/args (s/keys :opt []))
@@ -53,10 +91,13 @@
 
 (s/def :venia/queries (s/coll-of :venia/query :min-count 1))
 
-(s/def :venia/query-def (s/keys :req [:venia/queries]
-                                :opt [:venia/fragments
-                                      :venia/operation
-                                      :venia/variables]))
+
+(s/def :venia/valid-fragments (s/conformer valid-fragments))
+(s/def :venia/query-def (s/and (s/keys :req [:venia/queries]
+                                       :opt [:venia/fragments
+                                             :venia/operation
+                                             :venia/variables])
+                               :venia/valid-fragments))
 
 (defn query->spec [query]
   (let [conformed (s/conform :venia/query-def query)]
