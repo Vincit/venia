@@ -82,7 +82,15 @@
                                                                                                                                               [:venia/field :email]]}]]}]}))))
   (testing "Undefined fragments are used in query definition, should throw exception"
     (is (thrown? #?(:clj  Exception
-                    :cljs js/Error) (vs/query->spec {:venia/queries   [[:employee {:id 1 :active true} :fragment/undefined]]}))))
+                    :cljs js/Error) (vs/query->spec {:venia/queries [[:employee {:id 1 :active true} :fragment/undefined]]}))))
+  (testing "Invalid variable is used in query definition, should throw exception"
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec {:venia/queries   [[:employee {:id 1 :active :$invalid} [:name]]]
+                                                     :venia/variables [{:variable/name "valid"
+                                                                        :variable/type :Int}]}))))
+  (testing "Undefined variables are used in query definition, should throw exception"
+    (is (thrown? #?(:clj  Exception
+                    :cljs js/Error) (vs/query->spec {:venia/queries [[:employee {:id 1 :active :$undefined} [:name]]]}))))
   (testing "Valid vector with all possible data, should return conformed data"
     (is (= [:venia/query-def {:venia/operation {:operation/type :query
                                                 :operation/name "employeeQuery"}

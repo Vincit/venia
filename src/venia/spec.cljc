@@ -2,7 +2,8 @@
   (:require #?(:clj [clojure.spec.alpha :as s]
                :cljs [cljs.spec.alpha :as s])
                     [venia.exception :as ex]
-                    [clojure.set :as c-set]))
+                    [clojure.set :as c-set]
+                    [clojure.string :as c-string]))
 
 (defn- fragment-keyword?
   "Checks if keyword has :fragment namespace"
@@ -34,7 +35,7 @@
        set))
 
 (defn- valid-fragments
-  "Checks that all fragments used in queries are actually defined"
+  "Checks that all fragments used in queries are actually defined."
   [x]
   (if-not (:venia/fragments x)
     (let [used-fragments (resolve-used-fragments x)]
@@ -53,6 +54,46 @@
         x
         (ex/throw-ex {:venia/ex-type :venia/invalid-fragments
                       :venia/ex-data undefined-fragments})))))
+
+(defn- extract-variables [query]
+  (let [args (or (get-in query [:query/data :args]) (:args query))]
+    (->> args
+         vals
+         (filter #(and (keyword? %)
+                       (c-string/index-of (name %) "$")))
+         (map #(c-string/replace (name %) "$" "")))))
+
+(defn- resolve-used-variables
+  [x]
+  (->> x
+       :venia/queries
+       (map #(-> %
+                 second
+                 extract-variables))
+       flatten
+       (remove nil?)
+       set))
+
+(defn- valid-variables
+  "Checks that all variables used in queries are actually defined."
+  [x]
+  (if-not (:venia/variables x)
+    (let [used-variables (resolve-used-variables x)]
+      (if-not (empty? used-variables)
+        (ex/throw-ex {:venia/ex-type :venia/invalid-variables
+                      :venia/ex-data used-variables})
+        x))
+
+    (let [variables-names (->> x
+                               :venia/variables
+                               (map #(c-string/replace (:variable/name %) "$" ""))
+                               set)
+          used-variables (resolve-used-variables x)
+          undefined-variables (c-set/difference used-variables variables-names)]
+      (if (empty? undefined-variables)
+        x
+        (ex/throw-ex {:venia/ex-type :venia/invalid-variables
+                      :venia/ex-data undefined-variables})))))
 
 (s/def :venia/query-name keyword?)
 (s/def :venia/fields
@@ -93,11 +134,14 @@
 
 
 (s/def :venia/valid-fragments (s/conformer valid-fragments))
+(s/def :venia/valid-variables (s/conformer valid-variables))
+
 (s/def :venia/query-def (s/and (s/keys :req [:venia/queries]
                                        :opt [:venia/fragments
                                              :venia/operation
                                              :venia/variables])
-                               :venia/valid-fragments))
+                               :venia/valid-fragments
+                               :venia/valid-variables))
 
 (defn query->spec [query]
   (let [conformed (s/conform :venia/query-def query)]
