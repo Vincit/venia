@@ -29,7 +29,7 @@ The easiest way to start with venia, is simple's query generation.
 (ns my.project
   (:require [venia.core :as v]))
 
-{:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]}
+(v/graphql-query {:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]})
 
 => "{employee(id:1,active:true){name,address,friends{name,email}}}"
 ```
