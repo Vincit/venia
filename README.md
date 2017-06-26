@@ -144,6 +144,23 @@ fragment comparisonFields on Worker {
 
 ```
 
+
+### Validation
+
+Venia will verify that you don't use undefined variables or fragments. 
+
+For example, the following `v/graphql-query` calls will throw exceptions:
+
+```clj
+
+(v/graphql-query {:venia/queries [[:employee {:id 1 :active true} :fragment/undefined]]}
+
+(v/graphql-query {:venia/queries [[:employee {:id 1 :active :$undefined} [:name]]]}))
+```
+
+because fragment and variable are never defined.
+
+
 ## License
 
 Copyright © 2017 Vincit
