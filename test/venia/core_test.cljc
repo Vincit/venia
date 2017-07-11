@@ -1,5 +1,6 @@
 (ns venia.core-test
-  (:require [venia.core :as v]
+  (:require [clojure.string :as string]
+            [venia.core :as v]
     #?(:cljs [cljs.test :refer-macros [is are deftest testing]]
        :clj
             [clojure.test :refer :all])))
@@ -13,7 +14,16 @@
   (is (= "[1,{id:1},\"human\"]" (v/arg->str [1 {:id 1} "human"])))
   (is (= "human" (v/arg->str :human)))
   (is (= "1" (v/arg->str 1)))
-  (is (= "{active:true}" (v/arg->str {:active true}))))
+  (is (= "{active:true}" (v/arg->str {:active true})))
+  (let [value (hash-map :a 0 :b 1 :c 2)
+        output (v/arg->str value)]
+    (is (and (string/starts-with? output "{")
+             (string/ends-with? output "}")))
+    (is (= (set ["a:0" "b:1" "c:2"])
+           (-> output
+               (string/replace #"^.|.$" "")
+               (string/split #",")
+               (set))))))
 
 (deftest arguments->str-test
   (is (= "" (v/arguments->str {})))
