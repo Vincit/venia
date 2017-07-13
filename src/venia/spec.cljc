@@ -109,7 +109,7 @@
                          :fragment fragment-keyword?))))
 
 (s/def :venia/args (s/keys :opt []))
-(s/def :query/data (s/cat :query :venia/query-name :args (s/? :venia/args) :fields :venia/fields))
+(s/def :query/data (s/cat :query :venia/query-name :args (s/? :venia/args) :fields (s/? :venia/fields)))
 (s/def :venia/query (s/or :query/data :query/data
                           :venia/query-with-data (s/keys :req [:query/data]
                                                          :opt [:query/alias])))

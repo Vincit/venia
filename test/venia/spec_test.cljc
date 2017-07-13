@@ -20,9 +20,11 @@
   (testing ":venia/queries is empty, should throw exception"
     (is (thrown? #?(:clj  Exception
                     :cljs js/Error) (vs/query->spec {:venia/queries []}))))
-  (testing "Query vector has only query name, should throw exception"
-    (is (thrown? #?(:clj  Exception
-                    :cljs js/Error) (vs/query->spec {:venia/queries [[:queryName]]}))))
+
+  (testing "Query vector has only query name, should return conformed data."
+    (is (= [:venia/query-def {:venia/queries [[:query/data {:query :queryName}]]}]
+           (vs/query->spec {:venia/queries [[:queryName]]}))))
+
   (testing "Query vector has only fields, should throw exception"
     (is (thrown? #?(:clj  Exception
                     :cljs js/Error) (vs/query->spec (vs/query->spec {:venia/queries [[[:x :y]]]})))))
