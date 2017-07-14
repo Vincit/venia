@@ -40,6 +40,8 @@
            (arg->str [arg] (str "\"" arg "\""))
            PersistentArrayMap
            (arg->str [arg] (str "{" (arguments->str arg) "}"))
+           PersistentHashMap
+           (arg->str [arg] (str "{" (arguments->str arg) "}"))
            PersistentVector
            (arg->str [arg] (str "[" (apply str (interpose "," (map arg->str arg))) "]"))
            Keyword
