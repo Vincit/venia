@@ -91,6 +91,13 @@
          (name (:fragment/type fragment))
          fields)))
 
+(defn include-fields?
+  "Include fields if fields is not empty or is a keyword.
+   fields could be nil or empty for operations that return a scalar."
+  [fields]
+  (or (keyword? fields)
+      (not (empty? fields))))
+
 (defmulti ->query-str
   (fn [query]
     (cond (vector? query) (first query)
@@ -156,7 +163,7 @@
   "Processes simple query."
   (let [query-str (name (:query query))
         args (when (:args query) (str "(" (arguments->str (:args query)) ")"))
-        fields (str "{" (fields->str (:fields query)) "}")]
+        fields (when (include-fields? (:fields query)) (str "{" (fields->str (:fields query)) "}"))]
     (str query-str args fields)))
 
 (defmethod ->query-str :default
@@ -164,7 +171,7 @@
   "Processes a query map (with query name, args and fields)"
   (let [query-str (name (:query query))
         args (when (:args query) (str "(" (arguments->str (:args query)) ")"))
-        fields (str "{" (fields->str (:fields query)) "}")]
+        fields (when (include-fields? (:fields query)) (str "{" (fields->str (:fields query)) "}"))]
     (str query-str args fields)))
 
 (defn graphql-query

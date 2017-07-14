@@ -65,6 +65,21 @@
           query-str "{employee(id:1,active:true){name,address,friends(id:1){name,email}}}"]
       (is (= query-str (v/graphql-query data)))))
 
+  (testing "Should create a valid graphql string when no args are required and no fields are specified."
+    (let [data {:venia/queries [[:getDate]]}
+          query-str "{getDate}"]
+      (is (= query-str (v/graphql-query data)))))
+
+  (testing "Should create a valid graphql string there are args and no fields are specified."
+    (let [data {:venia/queries [[:sayHello {:name "Tom"}]]}
+          query-str "{sayHello(name:\"Tom\")}"]
+      (is (= query-str (v/graphql-query data)))))
+
+  (testing "Should create a valid graphql string there are no args but fields are specified."
+    (let [data {:venia/queries [[:sayHello [:name]]]}
+          query-str "{sayHello{name}}"]
+      (is (= query-str (v/graphql-query data)))))
+
   (testing "Invalid query, should throw exception"
     (is (thrown? #?(:clj  Exception
                     :cljs js/Error) (v/graphql-query []))))
