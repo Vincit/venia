@@ -23,7 +23,13 @@
            (-> output
                (string/replace #"^.|.$" "")
                (string/split #",")
-               (set))))))
+               (set)))))
+  ;; List in cljs
+  (is (= "[1,2,3]" (v/arg->str '(1 2 3))))
+  ;; IndexedSeq in cljs
+  (is (= "[1,2,3]" (v/arg->str (seq [1 2 3]))))
+  ;; LazySeq in cljs
+  (is (= "[1,2,3]" (v/arg->str (map :x [{:x 1} {:x 2} {:x 3}])))))
 
 (deftest arguments->str-test
   (is (= "" (v/arguments->str {})))
