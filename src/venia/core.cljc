@@ -19,6 +19,11 @@
        flatten
        (apply str)))
 
+(defn sequential->str
+  "Given something that is sequential format it to be like a JSON array."
+  [arg]
+  (str "[" (apply str (interpose "," (map arg->str arg))) "]"))
+
 #?(:clj (extend-protocol ArgumentFormatter
           nil
           (arg->str [arg] "null")
@@ -43,7 +48,13 @@
            PersistentHashMap
            (arg->str [arg] (str "{" (arguments->str arg) "}"))
            PersistentVector
-           (arg->str [arg] (str "[" (apply str (interpose "," (map arg->str arg))) "]"))
+           (arg->str [arg] (sequential->str arg))
+           IndexedSeq
+           (arg->str [arg] (sequential->str arg))
+           LazySeq
+           (arg->str [arg] (sequential->str arg))
+           List
+           (arg->str [arg] (sequential->str arg))
            Keyword
            (arg->str [arg] (name arg))
            number
