@@ -39,6 +39,19 @@ Obviously, If we would like to fetch employees and projects within the same simp
 => "{employee(active:true){name,address},project(active:true){customer,price}}"
 ```
 
+### Field arguments
+
+In the example above, `:employee` and `:projects` fields have arguments `{:id 1 :active true}` and `{:id 1 :active true}` 
+respectively.
+
+We can add arguments to other fields easily by wrapping field name and its arguments to vector `[:customer {:id 2}]`:
+
+```clj
+(v/graphql-query {:venia/queries [[:projects {:active true} [[:customer {:id 2}] :price]]]})
+
+=> "{project(active:true){customer(id:2),price}}"
+```
+
 ### Query with alias
 
 Now, if we need to have an alias for query, it can be easily achieved by using venia's query-with-data map
