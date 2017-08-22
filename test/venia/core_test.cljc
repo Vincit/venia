@@ -81,6 +81,16 @@
           query-str "{employee(id:1,active:true){name,address,friends(id:1){name,email}}}"]
       (is (= query-str (v/graphql-query data)))))
 
+  (testing "Should create a valid graphql string using params on fields."
+    (let [data {:venia/queries [[:employee [[:name {:isEmpty false}] :address [:friends [:name [:email {:isValid true}]]]]]]}
+          query-str "{employee{name(isEmpty:false),address,friends{name,email(isValid:true)}}}"]
+      (is (= query-str (v/graphql-query data)))))
+
+  (testing "Should create a valid graphql string using params on different nested levels of fields."
+    (let [data {:venia/queries [[:employee {:id 1 :active true} [[:name {:isEmpty false}] :address [:friends {:id 1} [:name [:email {:isValid true}]]]]]]}
+          query-str "{employee(id:1,active:true){name(isEmpty:false),address,friends(id:1){name,email(isValid:true)}}}"]
+      (is (= query-str (v/graphql-query data)))))
+
   (testing "Should create a valid graphql string when no args are required and no fields are specified."
     (let [data {:venia/queries [[:getDate]]}
           query-str "{getDate}"]

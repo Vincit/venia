@@ -101,6 +101,9 @@
     #(or-conformer %
                    (s/or :fields
                          (s/coll-of (s/or :venia/field keyword?
+
+                                          :venia/field-with-args (s/cat :venia/field keyword?
+                                                                        :args :venia/args)
                                           :venia/nested-field-arg-only (s/cat :venia/nested-field-root keyword?
                                                                               :args :venia/args)
                                           :venia/nested-field (s/cat :venia/nested-field-root keyword?
