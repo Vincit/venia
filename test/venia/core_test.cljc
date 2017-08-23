@@ -38,6 +38,9 @@
   (is (= "id:1,type:\"human\"" (v/arguments->str {:id 1 :type "human"})))
   (is (= "id:1,vector:[1,2,3]" (v/arguments->str {:id 1 :vector [1 2 3]}))))
 
+(deftest meta-field->str
+  (is (= "__typename" (v/meta-field->str :meta/typename))))
+
 (deftest fields->str-test
   (is (= "name" (v/fields->str [[:venia/field :name]])))
   (is (= "name,address" (v/fields->str [[:venia/field :name] [:venia/field :address]])))
@@ -69,6 +72,11 @@
   (testing "Should create a valid graphql string."
     (let [data {:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]}
           query-str "{employee(id:1,active:true){name,address,friends{name,email}}}"]
+      (is (= query-str (v/graphql-query data)))))
+
+  (testing "Should create a valid graphql string with __typename meta field included"
+    (let [data {:venia/queries [[:employee {:id 1 :active true} [:name :address :meta/typename [:friends [:meta/typename :name :email]]]]]}
+          query-str "{employee(id:1,active:true){name,address,__typename,friends{__typename,name,email}}}"]
       (is (= query-str (v/graphql-query data)))))
 
   (testing "Should create a valid graphql string using params on nested fields that doesnt't have nested fields."

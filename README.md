@@ -169,6 +169,26 @@ For example, the following `v/graphql-query` calls will throw exceptions:
 
 because fragment and variable are never defined.
 
+### Meta fields
+
+You can use graphql's `__typename` meta field anywhere inside of your query.
+For example:
+
+```clj
+(v/graphql-query {:venia/queries [[:employee [:meta/typename :name :address]]}
+
+=> prettified:
+
+{
+  employee {
+    __typename,
+    name,
+    address
+  }
+}
+
+```
+
 
 ## License
 

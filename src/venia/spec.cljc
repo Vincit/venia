@@ -95,12 +95,15 @@
         (ex/throw-ex {:venia/ex-type :venia/invalid-variables
                       :venia/ex-data undefined-variables})))))
 
+(def meta-fields #{:meta/typename})
+
 (s/def :venia/query-name keyword?)
 (s/def :venia/fields
   (s/conformer
     #(or-conformer %
                    (s/or :fields
-                         (s/coll-of (s/or :venia/field keyword?
+                         (s/coll-of (s/or :venia/meta-field meta-fields
+                                          :venia/field keyword?
 
                                           :venia/field-with-args (s/cat :venia/field keyword?
                                                                         :args :venia/args)

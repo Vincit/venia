@@ -64,6 +64,11 @@
            boolean
            (arg->str [arg] (str arg))))
 
+(defn meta-field->str
+  "Converts namespaced meta field keyword to graphql format, e.g :meta/typename -> __typename"
+  [meta-field]
+  (str "__" (name meta-field)))
+
 (defn fields->str
   "Given a spec conformed vector of query fields (and possibly nested fields),
   concatenates them to string, keeping nested structures intact."
@@ -72,6 +77,7 @@
     (str "..." (name fields))
     (->> (for [[type value] fields]
            (condp = type
+             :venia/meta-field (meta-field->str value)
              :venia/field (name value)
              :venia/field-with-args (str (name (:venia/field value))
                                          (when (:args value)
