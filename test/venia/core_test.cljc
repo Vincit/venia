@@ -51,10 +51,19 @@
 (deftest variables->str-test
   (is (= "$id:Int" (v/variables->str [{:variable/name "id"
                                        :variable/type :Int}])))
+  (is (= "$id:Int=2" (v/variables->str [{:variable/name    "id"
+                                         :variable/type    :Int
+                                         :variable/default 2}])))
   (is (= "$id:Int,$name:String" (v/variables->str [{:variable/name "id"
                                                     :variable/type :Int}
                                                    {:variable/name "name"
                                                     :variable/type :String}])))
+  (is (= "$id:Int=1,$name:String=\"my-name\"" (v/variables->str [{:variable/name    "id"
+                                                                  :variable/type    :Int
+                                                                  :variable/default 1}
+                                                                 {:variable/name    "name"
+                                                                  :variable/type    :String
+                                                                  :variable/default "my-name"}])))
   (is (= "" (v/variables->str nil)))
   (is (= "" (v/variables->str []))))
 

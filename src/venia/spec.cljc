@@ -133,7 +133,8 @@
 
 (s/def :variable/name string?)
 (s/def :variable/type keyword?)
-(s/def :query/variable (s/keys :req [:variable/name :variable/type]))
+(s/def :query/variable (s/keys :req [:variable/name :variable/type]
+                               :opt [:variable/default]))
 (s/def :venia/variables (s/coll-of :query/variable :min-count 1))
 
 (s/def :venia/queries (s/coll-of :venia/query :min-count 1))

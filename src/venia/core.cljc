@@ -98,8 +98,8 @@
 
   E.g. (variables->str [{:variable/name \"id\" :variable/type :Int}]) => \"$id: Int\""
   [variables]
-  (->> (for [{var-name :variable/name var-type :variable/type} variables]
-         (str "$" var-name ":" (name var-type)))
+  (->> (for [{var-name :variable/name var-type :variable/type var-default :variable/default} variables]
+         (str "$" var-name ":" (name var-type) (when var-default (str "=" (arg->str var-default)))))
        (interpose ",")
        (apply str)))
 

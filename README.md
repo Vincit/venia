@@ -115,8 +115,9 @@ an operation type and name. Notice, currently on `:query` operations are support
 ```clj
 (v/graphql-query {:venia/operation {:operation/type :query
                                     :operation/name "employeeQuery"}
-                  :venia/variables [{:variable/name "id"
-                                     :variable/type :Int}
+                  :venia/variables [{:variable/name    "id"
+                                     :variable/type    :Int
+                                     :variable/default 1}
                                     {:variable/name "name"
                                      :variable/type :String}]
                   :venia/queries   [{:query/data  [:employee {:id     :$id
@@ -133,7 +134,7 @@ an operation type and name. Notice, currently on `:query` operations are support
                                      :fragment/fields [:name :address [:friends [:name :email]]]}]})
 
 => prettified:
-query employeeQuery($id: Int, $name: String) {
+query employeeQuery($id: Int = 1, $name: String) {
   workhorse: employee(id: $id, active: true, name: $name) {
     ...comparisonFields
   }
