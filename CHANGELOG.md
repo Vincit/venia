@@ -1,6 +1,19 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.2.3 - 2017-08-23
+### Added 
+- Support for queries returning scalars. Pull request [#10](https://github.com/Vincit/venia/pull/10)
+- Arguments for fields on all levels of query are allowed. 
+All you need to do is Just wrap field's keyword and args map in vector, like `{:venia/queries [[:employee [[:name {:preferNickname true}] :address]]]}`
+
+### Fixed
+- arg->str for PersistentHashMap in cljs. Pull request [#11](https://github.com/Vincit/venia/pull/11)
+- arg->str for List, LazySeq and IndexedSeq. Pull request [#12](https://github.com/Vincit/venia/pull/12)
+
+### Changed
+- Updated clojurescript version to 1.9.908
+
 ## 0.2.2 - 2017-06-26
 ### Added
 - Fragment and variable validation
