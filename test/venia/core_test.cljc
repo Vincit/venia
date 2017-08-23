@@ -203,4 +203,18 @@
           query-str (str "query employeeQuery($id:Int,$name:String){workhorse:employee(id:$id,active:true,name:$name){...comparisonFields},"
                          "boss:employee(id:$id,active:false){...comparisonFields}} fragment comparisonFields on Worker{name,address,friends{name,email}}")
           result (v/graphql-query data)]
+      (is (= query-str result))))
+
+  (testing "Should create a valid graphql mutation"
+    (let [data {:venia/operation {:operation/type :mutation
+                                  :operation/name "AddProjectToEmployee"}
+                :venia/variables [{:variable/name "id"
+                                   :variable/type :Int!}
+                                  {:variable/name "project"
+                                   :variable/type :ProjectNameInput!}]
+                :venia/queries   [[:addProject {:employeeId :$id
+                                                :project    :$project}
+                                   [:allocation :name]]]}
+          query-str (str "mutation AddProjectToEmployee($id:Int!,$project:ProjectNameInput!){addProject(employeeId:$id,project:$project){allocation,name}}")
+          result (v/graphql-query data)]
       (is (= query-str result)))))
