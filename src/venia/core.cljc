@@ -1,5 +1,6 @@
 (ns venia.core
-  (:require [venia.spec :as spec])
+  (:require [venia.spec :as spec]
+            [clojure.string :as str])
   #?(:clj
      (:import (clojure.lang IPersistentMap Keyword IPersistentCollection))))
 
@@ -89,7 +90,13 @@
                                       (fields->str (:venia/nested-field-children value))
                                       "}")
              :venia/nested-field-arg-only (str (name (:venia/nested-field-root value))
-                                            (str "(" (arguments->str (:args value)) ")"))))
+                                               (str "(" (arguments->str (:args value)) ")"))
+             :venia/fragments (str/join " " (map #(str "..." (name %)) value))
+             :venia/nested-field-with-fragments (str (name (:venia/nested-field-root value))
+                                                     "{"
+                                                     (str/join " " (map #(str "..." (name %))
+                                                                        (:venia/fragments value)))
+                                                     "}")))
          (interpose ",")
          (apply str))))
 

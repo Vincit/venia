@@ -5,11 +5,15 @@
                     [clojure.set :as c-set]
                     [clojure.string :as c-string]))
 
+(defn namespaced-fragment-kw?
+  [x]
+  (and (keyword? x)
+       (= "fragment" (namespace x))))
+
 (defn- fragment-keyword?
   "Checks if keyword has :fragment namespace"
   [x]
-  (if (and (keyword? x)
-           (= "fragment" (namespace x)))
+  (if (namespaced-fragment-kw? x)
     x
     ::s/invalid))
 
@@ -103,6 +107,9 @@
     #(or-conformer %
                    (s/or :fields
                          (s/coll-of (s/or :venia/meta-field meta-fields
+                                          :venia/fragments (s/coll-of namespaced-fragment-kw?)
+                                          :venia/nested-field-with-fragments (s/cat :venia/nested-field-root keyword?
+                                                                                    :venia/fragments (s/coll-of namespaced-fragment-kw?))
                                           :venia/field keyword?
 
                                           :venia/field-with-args (s/cat :venia/field keyword?
