@@ -48,6 +48,21 @@
                                                                                            :venia/nested-field-children [[:venia/field :name]
                                                                                                                          [:venia/field :email]]}]]}]]}]
            (vs/query->spec {:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]]}))))
+  (testing "Valid vector with single query and nested fragment, should return conformed data"
+    (is (= [:venia/query-def {:venia/queries [[:query/data {:query  :employee
+                                                            :args   {:id 1 :active true}
+                                                            :fields [[:venia/field :name] [:venia/field :address]
+                                                                     [:venia/nested-field {:venia/nested-field-root     :friends
+                                                                                           :venia/nested-field-children [[:venia/field :name]
+                                                                                                                         [:venia/field :email]]}]
+                                                                     [:venia/nested-field-with-fragments {:venia/nested-field-root :pet
+                                                                                                          :venia/fragments [:fragment/cat :fragment/dog]}]]}]]}]
+           (vs/query->spec {:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]] [:pet [:fragment/cat :fragment/dog]]]]]}))))
+  (testing "Valid vector with single query and top level fragments, should return conformed data"
+    (is (= [:venia/query-def {:venia/queries [[:query/data {:query  :employee
+                                                            :args   {:id 1 :active true}
+                                                            :fields [[:venia/fragments [:fragment/cat :fragment/dog]]]}]]}]
+           (vs/query->spec {:venia/queries [[:employee {:id 1 :active true} [[:fragment/cat :fragment/dog]]]]}))))
   (testing ":venia/operation is missing name, should throw exception"
     (is (thrown? #?(:clj  Exception
                     :cljs js/Error) (vs/query->spec {:venia/operation {:operation/type :query}

@@ -166,6 +166,59 @@
           result (v/graphql-query data)]
       (is (= query-str result))))
 
+  (testing "Should create a valid graphql query with multiple fragments for fields (deals with unions)"
+    (let [data {:venia/queries   [{:query/data  [:employee {:id 1 :active true} [[:fragment/comparisonFields :fragment/secondFragment]] ]
+                                   :query/alias :workhorse}
+                                  {:query/data  [:employee {:id 2 :active true} :fragment/comparisonFields]
+                                   :query/alias :boss}]
+                :venia/fragments [{:fragment/name   "comparisonFields"
+                                   :fragment/type   :Worker
+                                   :fragment/fields [:name :address [:friends [:name :email]]]}
+                                  {:fragment/name   "secondFragment"
+                                   :fragment/type   :Worker
+                                   :fragment/fields [:name]}]}
+          query-str (str "{workhorse:employee(id:1,active:true){...comparisonFields ...secondFragment},boss:employee(id:2,active:true){...comparisonFields}} "
+                         "fragment comparisonFields on Worker{name,address,friends{name,email}},"
+                         "fragment secondFragment on Worker{name}")
+          result (v/graphql-query data)]
+      (is (= query-str result))))
+
+  (testing "Should create a valid graphql query with nested fragments (deals with unions)"
+    (let [data {:venia/queries   [{:query/data  [:employee {:id 1 :active true} [[:data [:fragment/comparisonFields :fragment/secondFragment]]] ]
+                                   :query/alias :workhorse}
+                                  {:query/data  [:employee {:id 2 :active true} :fragment/comparisonFields]
+                                   :query/alias :boss}]
+                :venia/fragments [{:fragment/name   "comparisonFields"
+                                   :fragment/type   :Worker
+                                   :fragment/fields [:name :address [:friends [:name :email]]]}
+                                  {:fragment/name   "secondFragment"
+                                   :fragment/type   :Worker
+                                   :fragment/fields [:name]}]}
+          query-str (str "{workhorse:employee(id:1,active:true){data{...comparisonFields ...secondFragment}},boss:employee(id:2,active:true){...comparisonFields}} "
+                         "fragment comparisonFields on Worker{name,address,friends{name,email}},"
+                         "fragment secondFragment on Worker{name}")
+          result (v/graphql-query data)]
+      (is (= query-str result))))
+
+  (testing "Should create a valid graphql query with a fragment within a fragment field (deals with unions)"
+    (let [data {:venia/queries   [{:query/data  [:employee {:id 1 :active true} :fragment/comparisonFields]
+                                   :query/alias :workhorse}]
+                :venia/fragments [{:fragment/name   "comparisonFields"
+                                   :fragment/type   :Worker
+                                   :fragment/fields [:name :address [:friends [:name :email]] [:pet [:fragment/dog :fragment/cat]]]}
+                                  {:fragment/name   "dog"
+                                   :fragment/type   :Dog
+                                   :fragment/fields [:name :bark]}
+                                  {:fragment/name   "cat"
+                                   :fragment/type   :Cat
+                                   :fragment/fields [:name :purr]}]}
+          query-str (str "{workhorse:employee(id:1,active:true){...comparisonFields}} "
+                         "fragment comparisonFields on Worker{name,address,friends{name,email},pet{...dog ...cat}},"
+                         "fragment dog on Dog{name,bark},"
+                         "fragment cat on Cat{name,purr}")
+          result (v/graphql-query data)]
+      (is (= query-str result))))
+
   (testing "Should create a valid graphql query with variables"
     (let [data {:venia/operation {:operation/type :query
                                   :operation/name "employeeQuery"}
