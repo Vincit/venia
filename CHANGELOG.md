@@ -1,6 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.2.4 - 2017-10-25
+### Added
+- Support for unions. Pull request [#16](https://github.com/Vincit/venia/pull/16)
+- Variable defaults
+- `_typename` metafield support
+- Mutation support
+
+### Chnaged
+- Updated clojurescript to 1.9.946
+- Updated clojure to 1.9.0-beta2
+
 ## 0.2.3 - 2017-08-23
 ### Added 
 - Support for queries returning scalars. Pull request [#10](https://github.com/Vincit/venia/pull/10)
