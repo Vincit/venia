@@ -109,7 +109,7 @@ fragment comparisonFields on Worker {
 ### Query with variables
 
 Now you can generate really complex queries with variables as well. In order to define variables, we need to define 
-an operation type and name. Notice, currently on `:query` operations are supported.
+an operation type and name.
 
 
 ```clj
@@ -154,6 +154,30 @@ fragment comparisonFields on Worker {
 
 ```
 
+### Mutation
+
+Mutations are also supported, just use `:mutation` operation type:
+
+```clj
+
+(v/graphql-query {:venia/operation {:operation/type :mutation
+                                    :operation/name "AddProjectToEmployee"}
+                  :venia/variables [{:variable/name "id"
+                                     :variable/type :Int!}
+                                    {:variable/name "project"
+                                     :variable/type :ProjectNameInput!}]
+                  :venia/queries   [[:addProject {:employeeId :$id
+                                                  :project    :$project}
+                                     [:allocation :name]]]})
+                                     
+=> prettified:
+mutation AddProjectToEmployee($id:Int!,$project:ProjectNameInput!) {
+  addProject(employeeId:$id, project:$project) {
+    allocation,
+    name
+  }
+}
+```
 
 ### Validation
 
