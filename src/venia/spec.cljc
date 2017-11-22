@@ -134,7 +134,7 @@
 (s/def :venia/fragment (s/keys :req [:fragment/name :fragment/type :fragment/fields]))
 (s/def :venia/fragments (s/coll-of :venia/fragment :min-count 1))
 
-(s/def :operation/type #{:query :mutation})
+(s/def :operation/type #{:query :mutation :subscription})
 (s/def :operation/name string?)
 (s/def :venia/operation (s/keys :req [:operation/type :operation/name]))
 
