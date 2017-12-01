@@ -13,7 +13,7 @@ A Clojure(Script) qraphql query client library. Generate valid graphql queries w
 Venia is originally supposed to be used in Clojurescript apps, but can be used as well in Clojure, as the core 
 is written in CLJC. The sole purpose of this library is graphql query string generation from Clojure data, 
 so that strings concatenations and manipulations could be avoided when using grapqhl.
-It is up to developers to hook it up to frontend apps. However, at least some sort of re-frame-grapqhl-fx library 
+It is up to developers to hook it up to frontend apps. However, at least some sort of re-frame-graphql-fx library 
 is on a roadmap. 
 
 
