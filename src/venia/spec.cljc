@@ -105,7 +105,8 @@
 (s/def :venia/fields
   (s/conformer
     #(or-conformer %
-                   (s/or :fields
+                   (s/or
+                         :fields
                          (s/coll-of (s/or :venia/meta-field meta-fields
                                           :venia/fragments (s/coll-of namespaced-fragment-kw?)
                                           :venia/nested-field-with-fragments (s/cat :venia/nested-field-root keyword?
@@ -114,11 +115,16 @@
 
                                           :venia/field-with-args (s/cat :venia/field keyword?
                                                                         :args :venia/args)
+
+                                          :venia/field-with-data (s/keys :req [:field/data]
+                                                                         :opt [:field/alias])
+
                                           :venia/nested-field-arg-only (s/cat :venia/nested-field-root keyword?
                                                                               :args :venia/args)
                                           :venia/nested-field (s/cat :venia/nested-field-root keyword?
                                                                      :args (s/? :venia/args)
                                                                      :venia/nested-field-children :venia/fields)))
+
                          :fragment fragment-keyword?))))
 
 (s/def :venia/args (s/keys :opt []))
@@ -127,6 +133,9 @@
                           :venia/query-with-data (s/keys :req [:query/data]
                                                          :opt [:query/alias])))
 (s/def :query/alias keyword?)
+
+(s/def :field/data :venia/fields)
+(s/def :field/alias :query/alias)
 
 (s/def :fragment/name string?)
 (s/def :fragment/type keyword?)
