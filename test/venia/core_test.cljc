@@ -127,13 +127,22 @@
     (is (thrown? #?(:clj  Exception
                     :cljs js/Error) (v/graphql-query []))))
 
-  (testing "Should create a valid graphql string with alias"
+  (testing "Should create a valid graphql string with query aliases"
     (let [data {:venia/queries [{:query/data  [:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]
                                  :query/alias :workhorse}
                                 {:query/data  [:employee {:id 2 :active true} [:name :address [:friends [:name :email]]]]
                                  :query/alias :boss}]}
           query-str (str "{workhorse:employee(id:1,active:true){name,address,friends{name,email}},"
                          "boss:employee(id:2,active:true){name,address,friends{name,email}}}")]
+      (is (= query-str (v/graphql-query data)))))
+
+  (testing "Should create a valid graphql string with field aliases"
+    (let [data {:venia/queries [[:employee {:id 1 :active true} [:name :address
+                                                                 {:field/data [[:friends [:name :email]]]
+                                                                  :field/alias :mates}
+                                                                 {:field/data [[:friends [:name :email]]]
+                                                                  :field/alias :enemies}]]]}
+          query-str (str "{employee(id:1,active:true){name,address,mates:friends{name,email},enemies:friends{name,email}}}")]
       (is (= query-str (v/graphql-query data)))))
 
   (testing "Should create a valid graphql query with fragment"
