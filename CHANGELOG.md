@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## 0.2.5 - 2017-12-21
+### Added
+- Aliases at field level #23
+- Subscription as valid operation type #21
+
+### Changed
+- Updated clojure to 1.9.0
+
 ## 0.2.4 - 2017-10-25
 ### Added
 - Support for unions. Pull request [#16](https://github.com/Vincit/venia/pull/16)
