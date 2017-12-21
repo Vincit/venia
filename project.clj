@@ -3,7 +3,7 @@
   :url "https://github.com/Vincit/venia"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-beta2" :scope "provided"]
+  :dependencies [[org.clojure/clojure "1.9.0" :scope "provided"]
                  [org.clojure/clojurescript "1.9.946" :scope "provided"]]
   :plugins [[lein-doo "0.1.7"]]
   :clean-targets ^{:protect false} ["resources" "target"]
