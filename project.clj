@@ -1,4 +1,4 @@
-(defproject vincit/venia "0.2.4"
+(defproject vincit/venia "0.2.5"
   :description "Clojure(Script) graphql client"
   :url "https://github.com/Vincit/venia"
   :license {:name "Eclipse Public License"
