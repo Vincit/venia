@@ -70,14 +70,14 @@
 (defn meta-field->str
   "Converts namespaced meta field keyword to graphql format, e.g :meta/typename -> __typename"
   [meta-field]
-  (str "__" (*keyword-transform-fn* meta-field)))
+  (str "__" (name meta-field)))
 
 (defn fields->str
   "Given a spec conformed vector of query fields (and possibly nested fields),
   concatenates them to string, keeping nested structures intact."
   [fields]
   (if (keyword? fields)
-    (str "..." (*keyword-transform-fn* fields))
+    (str "..." (*keyword-transform-fn* (name fields)))
     (->> (for [[type value] fields]
            (condp = type
              :venia/meta-field (meta-field->str value)
@@ -96,10 +96,10 @@
                                       "}")
              :venia/nested-field-arg-only (str (*keyword-transform-fn* (:venia/nested-field-root value))
                                                (str "(" (arguments->str (:args value)) ")"))
-             :venia/fragments (str/join " " (map #(str "..." (*keyword-transform-fn* %)) value))
+             :venia/fragments (str/join " " (map #(str "..." (*keyword-transform-fn* (name %))) value))
              :venia/nested-field-with-fragments (str (*keyword-transform-fn* (:venia/nested-field-root value))
                                                      "{"
-                                                     (str/join " " (map #(str "..." (*keyword-transform-fn* %))
+                                                     (str/join " " (map #(str "..." (*keyword-transform-fn* (name %)))
                                                                         (:venia/fragments value)))
                                                      "}")))
          (interpose ",")
