@@ -4,6 +4,8 @@
   #?(:clj
      (:import (clojure.lang IPersistentMap Keyword IPersistentCollection))))
 
+(def ^:dynamic *keyword-transform-fn* name)
+
 (defprotocol ArgumentFormatter
   "Protocol responsible for query arguments' formatting to string.
   Has separate implementations for general data types in cljs and clj."
@@ -15,7 +17,7 @@
   E.g. (arguments->str {:id 1 :type \"human\"}) => id:1,type:\"human\""
   [args]
   (->> (for [[k v] args]
-         [(name k) ":" (arg->str v)])
+         [(*keyword-transform-fn* k) ":" (arg->str v)])
        (interpose ",")
        flatten
        (apply str)))
@@ -35,7 +37,7 @@
           IPersistentCollection
           (arg->str [arg] (str "[" (apply str (interpose "," (map arg->str arg))) "]"))
           Keyword
-          (arg->str [arg] (name arg))
+          (arg->str [arg] (*keyword-transform-fn* arg))
           Object
           (arg->str [arg] (str arg))))
 
@@ -57,7 +59,7 @@
            List
            (arg->str [arg] (sequential->str arg))
            Keyword
-           (arg->str [arg] (name arg))
+           (arg->str [arg] (*keyword-transform-fn* arg))
            number
            (arg->str [arg] (str arg))
            object
@@ -75,29 +77,29 @@
   concatenates them to string, keeping nested structures intact."
   [fields]
   (if (keyword? fields)
-    (str "..." (name fields))
+    (str "..." (*keyword-transform-fn* (name fields)))
     (->> (for [[type value] fields]
            (condp = type
              :venia/meta-field (meta-field->str value)
-             :venia/field (name value)
-             :venia/field-with-args (str (name (:venia/field value))
+             :venia/field (*keyword-transform-fn* value)
+             :venia/field-with-args (str (*keyword-transform-fn* (:venia/field value))
                                          (when (:args value)
                                            (str "(" (arguments->str (:args value)) ")")))
-             :venia/field-with-data (str (when-let [alias (name (:field/alias value))]
+             :venia/field-with-data (str (when-let [alias (*keyword-transform-fn* (:field/alias value))]
                                            (str alias ":"))
                                          (fields->str (:field/data value)))
-             :venia/nested-field (str (name (:venia/nested-field-root value))
+             :venia/nested-field (str (*keyword-transform-fn* (:venia/nested-field-root value))
                                       (when (:args value)
                                         (str "(" (arguments->str (:args value)) ")"))
                                       "{"
                                       (fields->str (:venia/nested-field-children value))
                                       "}")
-             :venia/nested-field-arg-only (str (name (:venia/nested-field-root value))
+             :venia/nested-field-arg-only (str (*keyword-transform-fn* (:venia/nested-field-root value))
                                                (str "(" (arguments->str (:args value)) ")"))
-             :venia/fragments (str/join " " (map #(str "..." (name %)) value))
-             :venia/nested-field-with-fragments (str (name (:venia/nested-field-root value))
+             :venia/fragments (str/join " " (map #(str "..." (*keyword-transform-fn* (name %))) value))
+             :venia/nested-field-with-fragments (str (*keyword-transform-fn* (:venia/nested-field-root value))
                                                      "{"
-                                                     (str/join " " (map #(str "..." (name %))
+                                                     (str/join " " (map #(str "..." (*keyword-transform-fn* (name %)))
                                                                         (:venia/fragments value)))
                                                      "}")))
          (interpose ",")
@@ -109,7 +111,7 @@
   E.g. (variables->str [{:variable/name \"id\" :variable/type :Int}]) => \"$id: Int\""
   [variables]
   (->> (for [{var-name :variable/name var-type :variable/type var-default :variable/default} variables]
-         (str "$" var-name ":" (name var-type) (when var-default (str "=" (arg->str var-default)))))
+         (str "$" var-name ":" (*keyword-transform-fn* var-type) (when var-default (str "=" (arg->str var-default)))))
        (interpose ",")
        (apply str)))
 
@@ -118,9 +120,9 @@
   [fragment]
   (let [fields (str "{" (fields->str (:fragment/fields fragment)) "}")]
     (str "fragment "
-         (name (:fragment/name fragment))
+         (*keyword-transform-fn* (:fragment/name fragment))
          " on "
-         (name (:fragment/type fragment))
+         (*keyword-transform-fn* (:fragment/type fragment))
          fields)))
 
 (defn include-fields?
@@ -150,7 +152,7 @@
   [[_ query]]
   "Given a spec conformed root query map, creates a complete query string."
   (let [operation (:venia/operation query)
-        operation-with-name (when operation (str (name (:operation/type operation)) " " (:operation/name operation)))
+        operation-with-name (when operation (str (*keyword-transform-fn* (:operation/type operation)) " " (:operation/name operation)))
         variables (:venia/variables query)
         variables-str (when variables (str "(" (variables->str variables) ")"))
         fragments (:venia/fragments query)
@@ -170,8 +172,8 @@
   [query]
   "Processes a single query."
   (let [query-def (:venia/query query)
-        alias (when (:query/alias query) (str (name (:query/alias query)) ":"))
-        query-str (name (:query query-def))
+        alias (when (:query/alias query) (str (*keyword-transform-fn* (:query/alias query)) ":"))
+        query-str (*keyword-transform-fn* (:query query-def))
         args (when (:args query-def) (str "(" (arguments->str (:args query-def)) ")"))
         fields (str "{" (fields->str (:fields query-def)) "}")]
     (str alias query-str args fields)))
@@ -187,13 +189,13 @@
 (defmethod ->query-str :venia/query-with-data
   [[_ query]]
   (let [query-str (->query-str (:query/data query))
-        alias (when (:query/alias query) (str (name (:query/alias query)) ":"))]
+        alias (when (:query/alias query) (str (*keyword-transform-fn* (:query/alias query)) ":"))]
     (str alias query-str)))
 
 (defmethod ->query-str :query/data
   [[_ query]]
   "Processes simple query."
-  (let [query-str (name (:query query))
+  (let [query-str (*keyword-transform-fn* (:query query))
         args (when (:args query) (str "(" (arguments->str (:args query)) ")"))
         fields (when (include-fields? (:fields query)) (str "{" (fields->str (:fields query)) "}"))]
     (str query-str args fields)))
@@ -201,7 +203,7 @@
 (defmethod ->query-str :default
   [query]
   "Processes a query map (with query name, args and fields)"
-  (let [query-str (name (:query query))
+  (let [query-str (*keyword-transform-fn* (:query query))
         args (when (:args query) (str "(" (arguments->str (:args query)) ")"))
         fields (when (include-fields? (:fields query)) (str "{" (fields->str (:fields query)) "}"))]
     (str query-str args fields)))
