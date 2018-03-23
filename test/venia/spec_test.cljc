@@ -112,9 +112,9 @@
     (is (= [:venia/query-def {:venia/operation {:operation/type :query
                                                 :operation/name "employeeQuery"}
                               :venia/variables [{:variable/name "id"
-                                                 :variable/type :Int}
+                                                 :variable/type [:type :Int]}
                                                 {:variable/name "name"
-                                                 :variable/type :String}]
+                                                 :variable/type [:type :String]}]
                               :venia/fragments [{:fragment/name   "comparisonFields"
                                                  :fragment/type   :Worker
                                                  :fragment/fields [[:venia/field :name] [:venia/field :address]

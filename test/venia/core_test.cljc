@@ -50,19 +50,21 @@
 
 (deftest variables->str-test
   (is (= "$id:Int" (v/variables->str [{:variable/name "id"
-                                       :variable/type :Int}])))
+                                       :variable/type [:type :Int]}])))
+  (is (= "$ids:[Int!]" (v/variables->str [{:variable/name "ids"
+                                           :variable/type [:list [:Int!]]}])))
   (is (= "$id:Int=2" (v/variables->str [{:variable/name    "id"
-                                         :variable/type    :Int
+                                         :variable/type    [:type :Int]
                                          :variable/default 2}])))
   (is (= "$id:Int,$name:String" (v/variables->str [{:variable/name "id"
-                                                    :variable/type :Int}
+                                                    :variable/type [:type :Int]}
                                                    {:variable/name "name"
-                                                    :variable/type :String}])))
+                                                    :variable/type [:type :String]}])))
   (is (= "$id:Int=1,$name:String=\"my-name\"" (v/variables->str [{:variable/name    "id"
-                                                                  :variable/type    :Int
+                                                                  :variable/type    [:type :Int]
                                                                   :variable/default 1}
                                                                  {:variable/name    "name"
-                                                                  :variable/type    :String
+                                                                  :variable/type    [:type :String]
                                                                   :variable/default "my-name"}])))
   (is (= "" (v/variables->str nil)))
   (is (= "" (v/variables->str []))))
@@ -280,3 +282,15 @@
           query-str (str "mutation AddProjectToEmployee($id:Int!,$project:ProjectNameInput!){addProject(employeeId:$id,project:$project){allocation,name}}")
           result (v/graphql-query data)]
       (is (= query-str result)))))
+
+(deftest test-query-with-list-variables
+  (is (= (v/graphql-query
+          {:venia/operation
+           {:operation/type :query
+            :operation/name "MyQuery"}
+           :venia/queries
+           [[:node {:ids :$ids} [:id]]]
+           :venia/variables
+           [{:variable/name "ids"
+             :variable/type [:ID!]}]})
+         "query MyQuery($ids:[ID!]){node(ids:$ids){id}}")))

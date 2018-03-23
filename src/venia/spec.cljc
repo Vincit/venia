@@ -148,7 +148,10 @@
 (s/def :venia/operation (s/keys :req [:operation/type :operation/name]))
 
 (s/def :variable/name string?)
-(s/def :variable/type keyword?)
+
+(s/def :variable/type
+  (s/or :type keyword? :list (s/coll-of keyword? :kind vector? :count 1)))
+
 (s/def :query/variable (s/keys :req [:variable/name :variable/type]
                                :opt [:variable/default]))
 (s/def :venia/variables (s/coll-of :query/variable :min-count 1))
