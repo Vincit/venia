@@ -103,13 +103,22 @@
          (interpose ",")
          (apply str))))
 
+(defn- variable-type->str
+  "Convert a spec conformed variable type to a string."
+  [[tag type]]
+  (case tag
+    :list
+    (str "[" (-> type first name) "]")
+    :type
+    (name type)))
+
 (defn variables->str
   "Given a vector of variable maps, formats them and concatenates to string.
 
   E.g. (variables->str [{:variable/name \"id\" :variable/type :Int}]) => \"$id: Int\""
   [variables]
   (->> (for [{var-name :variable/name var-type :variable/type var-default :variable/default} variables]
-         (str "$" var-name ":" (name var-type) (when var-default (str "=" (arg->str var-default)))))
+         (str "$" var-name ":" (variable-type->str var-type) (when var-default (str "=" (arg->str var-default)))))
        (interpose ",")
        (apply str)))
 
