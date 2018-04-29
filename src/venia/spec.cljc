@@ -1,9 +1,9 @@
 (ns venia.spec
   (:require #?(:clj [clojure.spec.alpha :as s]
                :cljs [cljs.spec.alpha :as s])
-                    [venia.exception :as ex]
-                    [clojure.set :as c-set]
-                    [clojure.string :as c-string]))
+            [venia.exception :as ex]
+            [clojure.set :as c-set]
+            [clojure.string :as c-string]))
 
 (defn namespaced-fragment-kw?
   [x]

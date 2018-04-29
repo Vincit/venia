@@ -176,7 +176,7 @@
       (is (= query-str result))))
 
   (testing "Should create a valid graphql query with multiple fragments for fields (deals with unions)"
-    (let [data {:venia/queries   [{:query/data  [:employee {:id 1 :active true} [[:fragment/comparisonFields :fragment/secondFragment]] ]
+    (let [data {:venia/queries   [{:query/data  [:employee {:id 1 :active true} [[:fragment/comparisonFields :fragment/secondFragment]]]
                                    :query/alias :workhorse}
                                   {:query/data  [:employee {:id 2 :active true} :fragment/comparisonFields]
                                    :query/alias :boss}]
@@ -193,7 +193,7 @@
       (is (= query-str result))))
 
   (testing "Should create a valid graphql query with nested fragments (deals with unions)"
-    (let [data {:venia/queries   [{:query/data  [:employee {:id 1 :active true} [[:data [:fragment/comparisonFields :fragment/secondFragment]]] ]
+    (let [data {:venia/queries   [{:query/data  [:employee {:id 1 :active true} [[:data [:fragment/comparisonFields :fragment/secondFragment]]]]
                                    :query/alias :workhorse}
                                   {:query/data  [:employee {:id 2 :active true} :fragment/comparisonFields]
                                    :query/alias :boss}]
