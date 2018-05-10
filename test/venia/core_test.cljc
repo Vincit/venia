@@ -8,6 +8,13 @@
 (deftest ArgumentFormatter-test
   (is (= "null" (v/arg->str nil)))
   (is (= "\"human\"" (v/arg->str "human")))
+  (is (= "\"\\\"human\\\"\"" (v/arg->str "\"human\"")))
+  (is (= "\"What's a \\\"human\\\"?\"" (v/arg->str "What's a \"human\"?")))
+  (is (= "\"hu\\nman\"" (v/arg->str (str "hu" \newline "man"))))
+  (is (= "\"hu\\rman\"" (v/arg->str (str "hu" \return "man"))))
+  (is (= "\"hu\\tman\"" (v/arg->str (str "hu" \tab "man"))))
+  (is (= "\"hu\\fman\"" (v/arg->str (str "hu" \formfeed "man"))))
+  (is (= "\"hu\\bman\"" (v/arg->str (str "hu" \backspace "man"))))
   (is (= "{id:1}" (v/arg->str {:id 1})))
   (is (= "{id:null}" (v/arg->str {:id nil})))
   (is (= "[1,2,3]" (v/arg->str [1 2 3])))

@@ -25,11 +25,22 @@
   [arg]
   (str "[" (apply str (interpose "," (map arg->str arg))) "]"))
 
+(defn encode-string
+  "Handles escaping special characters."
+  [arg]
+  (str "\"" (str/escape arg {\"         "\\\""
+                             \\         "\\\\"
+                             \newline   "\\n"
+                             \return    "\\r"
+                             \tab       "\\t"
+                             \formfeed  "\\f"
+                             \backspace "\\b"}) "\""))
+
 #?(:clj (extend-protocol ArgumentFormatter
           nil
           (arg->str [arg] "null")
           String
-          (arg->str [arg] (str "\"" arg "\""))
+          (arg->str [arg] (encode-string arg))
           IPersistentMap
           (arg->str [arg] (str "{" (arguments->str arg) "}"))
           IPersistentCollection
@@ -43,7 +54,7 @@
            nil
            (arg->str [arg] "null")
            string
-           (arg->str [arg] (str "\"" arg "\""))
+           (arg->str [arg] (encode-string arg))
            PersistentArrayMap
            (arg->str [arg] (str "{" (arguments->str arg) "}"))
            PersistentHashMap
