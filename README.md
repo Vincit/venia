@@ -36,7 +36,7 @@ Obviously, If we would like to fetch employees and projects within the same simp
 (v/graphql-query {:venia/queries [[:employee {:id 1 :active true} [:name :address [:friends [:name :email]]]]
                                   [:projects {:active true} [:customer :price]]]})
 
-=> "{employee(active:true){name,address},project(active:true){customer,price}}"
+=> "{employee(id:1,active:true){name,address},project(active:true){customer,price}}"
 ```
 
 ### Field arguments
