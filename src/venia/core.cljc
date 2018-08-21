@@ -103,13 +103,30 @@
          (interpose ",")
          (apply str))))
 
+(defn variable-type->str
+  [[def-type ttype]]
+  (case def-type
+    :simple-type
+    (name ttype)
+
+    :complex-type
+    (let [required-str (when (:type/required? ttype) "!")]
+      (str
+       (cond
+         (:type/type ttype)
+         (name (:type/type ttype))
+
+         (= :list (:type/kind ttype))
+         (str "[" (variable-type->str (:type.list/items ttype)) "]"))
+       required-str))))
+
 (defn variables->str
   "Given a vector of variable maps, formats them and concatenates to string.
 
   E.g. (variables->str [{:variable/name \"id\" :variable/type :Int}]) => \"$id: Int\""
   [variables]
   (->> (for [{var-name :variable/name var-type :variable/type var-default :variable/default} variables]
-         (str "$" var-name ":" (name var-type) (when var-default (str "=" (arg->str var-default)))))
+         (str "$" var-name ":" (variable-type->str var-type) (when var-default (str "=" (arg->str var-default)))))
        (interpose ",")
        (apply str)))
 
