@@ -1,8 +1,10 @@
 (ns venia.spec-test
   (:require [venia.spec :as vs]
-    #?(:cljs [cljs.test :refer-macros [is are deftest testing]]
-       :clj
-            [clojure.test :refer :all])))
+            #?(:cljs [cljs.test :refer-macros [is are deftest testing]]
+               :clj
+               [clojure.test :refer :all])
+            #?(:clj [clojure.spec.alpha :as s]
+               :cljs [cljs.spec.alpha :as s])))
 
 (deftest query->spec-simple-query
   (testing "Wrong data type - vector instead of map, should throw exception"
@@ -112,9 +114,9 @@
     (is (= [:venia/query-def {:venia/operation {:operation/type :query
                                                 :operation/name "employeeQuery"}
                               :venia/variables [{:variable/name "id"
-                                                 :variable/type :Int}
+                                                 :variable/type [:simple-type :Int]}
                                                 {:variable/name "name"
-                                                 :variable/type :String}]
+                                                 :variable/type [:simple-type :String]}]
                               :venia/fragments [{:fragment/name   "comparisonFields"
                                                  :fragment/type   :Worker
                                                  :fragment/fields [[:venia/field :name] [:venia/field :address]
@@ -150,3 +152,27 @@
                             :venia/fragments [{:fragment/name   "comparisonFields"
                                                :fragment/type   :Worker
                                                :fragment/fields [:name :address [:friends [:name :email]]]}]})))))
+
+(deftest variable-tests
+  (is (s/valid? :query/variable
+                {:variable/name "Foo"
+                 :variable/type :Foo}))
+  (is (s/valid? :query/variable
+                {:variable/name "Foo"
+                 :variable/type {:type/type :Int}}))
+  (is (s/valid? :query/variable
+                {:variable/name "Foo"
+                 :variable/type {:type/type :Int
+                                 :type/required? true}}))
+  (is (s/valid? :query/variable
+                {:variable/name "Foo"
+                 :variable/type {:type/kind :list
+                                 :type.list/items :Int
+                                 :type/required? true}}))
+  (is (s/valid? :query/variable
+                {:variable/name "Foo"
+                 :variable/type {:type/kind :list
+                                 :type.list/items {:type/type :Int
+                                                   :type/required? true}
+                                 :type/required? true}}))
+  )

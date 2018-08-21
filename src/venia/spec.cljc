@@ -148,7 +148,18 @@
 (s/def :venia/operation (s/keys :req [:operation/type :operation/name]))
 
 (s/def :variable/name string?)
-(s/def :variable/type keyword?)
+(s/def :variable/type
+  (s/or :simple-type keyword?
+        :complex-type :variable/complex-type))
+(s/def :variable/complex-type
+  (s/keys :req [(or :type/type :type/kind)]
+          :opt [:type/required? :type.list/items]))
+
+(s/def :type/type keyword?)
+(s/def :type/kind keyword?)
+(s/def :type/required? boolean?)
+(s/def :type.list/items :variable/type)
+
 (s/def :query/variable (s/keys :req [:variable/name :variable/type]
                                :opt [:variable/default]))
 (s/def :venia/variables (s/coll-of :query/variable :min-count 1))

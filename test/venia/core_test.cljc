@@ -48,21 +48,41 @@
                                                                      :venia/nested-field-children [[:venia/field :name]
                                                                                                    [:venia/field :email]]}]]))))
 
+(deftest variable-type->str-test
+  (is (= "Int" (v/variable-type->str [:simple-type :Int])))
+  (is (= "Int" (v/variable-type->str [:complex-type {:type/type :Int}])))
+  (is (= "Int!" (v/variable-type->str [:complex-type {:type/type :Int
+                                                      :type/required? true}])))
+  (is (= "[Int]!" (v/variable-type->str [:complex-type {:type/kind :list
+                                                        :type.list/items [:simple-type :Int]
+                                                        :type/required? true}])))
+  (is (= "[Int!]!" (v/variable-type->str [:complex-type {:type/kind :list
+                                                         :type.list/items [:complex-type {:type/type :Int
+                                                                                          :type/required? true}]
+                                                         :type/required? true}]))))
+
 (deftest variables->str-test
   (is (= "$id:Int" (v/variables->str [{:variable/name "id"
-                                       :variable/type :Int}])))
+                                       :variable/type [:simple-type :Int]}])))
   (is (= "$id:Int=2" (v/variables->str [{:variable/name    "id"
-                                         :variable/type    :Int
+                                         :variable/type    [:simple-type :Int]
                                          :variable/default 2}])))
+  (is (= "$id:[Int!]!=2" (v/variables->str [{:variable/name    "id"
+                                             :variable/type
+                                             [:complex-type {:type/kind :list
+                                                             :type.list/items [:complex-type {:type/type :Int
+                                                                                              :type/required? true}]
+                                                             :type/required? true}]
+                                             :variable/default 2}])))
   (is (= "$id:Int,$name:String" (v/variables->str [{:variable/name "id"
-                                                    :variable/type :Int}
+                                                    :variable/type [:simple-type :Int]}
                                                    {:variable/name "name"
-                                                    :variable/type :String}])))
+                                                    :variable/type  [:simple-type :String]}])))
   (is (= "$id:Int=1,$name:String=\"my-name\"" (v/variables->str [{:variable/name    "id"
-                                                                  :variable/type    :Int
+                                                                  :variable/type    [:simple-type :Int]
                                                                   :variable/default 1}
                                                                  {:variable/name    "name"
-                                                                  :variable/type    :String
+                                                                  :variable/type    [:simple-type :String]
                                                                   :variable/default "my-name"}])))
   (is (= "" (v/variables->str nil)))
   (is (= "" (v/variables->str []))))
@@ -240,6 +260,24 @@
                                               :name   :$name}
                                    [:name :address [:friends [:name :email]]]]]}
           query-str (str "query employeeQuery($id:Int,$name:String){employee(id:$id,active:true,name:$name){name,address,friends{name,email}}}")
+          result (v/graphql-query data)]
+      (is (= query-str result))))
+
+  (testing "Should create a valid graphql query with complex variables"
+    (let [data {:venia/operation {:operation/type :query
+                                  :operation/name "employeeQuery"}
+                :venia/variables [{:variable/name "id"
+                                   :variable/type :Int}
+                                  {:variable/name "namelist"
+                                   :variable/type {:type/kind :list
+                                                   :type.list/items {:type/type :String
+                                                                     :type/required? true}
+                                                   :type/required? true}}]
+                :venia/queries   [[:employee {:id     :$id
+                                              :active true
+                                              :name   :$namelist}
+                                   [:name :address [:friends [:name :email]]]]]}
+          query-str (str "query employeeQuery($id:Int,$namelist:[String!]!){employee(id:$id,active:true,name:$namelist){name,address,friends{name,email}}}")
           result (v/graphql-query data)]
       (is (= query-str result))))
 
