@@ -170,5 +170,5 @@
   (let [conformed (s/conform :venia/query-def query)]
     (if (= ::s/invalid conformed)
       (ex/throw-ex {:venia/ex-type    :venia/spec-validation
-                    :venia/ex-explain (s/explain :venia/query-def query)})
+                    :venia/ex-explain (s/explain-str :venia/query-def query)})
       [:venia/query-def conformed])))
