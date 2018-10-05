@@ -9,6 +9,10 @@
   Has separate implementations for general data types in cljs and clj."
   (arg->str [arg]))
 
+(defprotocol VariableTypeFormatter
+  "Protocol responsible for converting variable types to string"
+  (var-type->str [variable]))
+
 (defn arguments->str
   "Given a map of query arguments, formats them and concatenates to string.
 
@@ -103,13 +107,32 @@
          (interpose ",")
          (apply str))))
 
+#?(:clj (extend-protocol VariableTypeFormatter
+          IPersistentCollection
+          (var-type->str [variable] (str "[" (-> variable first name) "]"))
+          Keyword
+          (var-type->str [variable] (name variable))))
+
+#?(:cljs (extend-protocol VariableTypeFormatter
+           PersistentVector
+           (var-type->str [variable] (str "[" (-> variable first name) "]"))
+           IndexedSeq
+           (var-type->str [variable] (str "[" (-> variable first name) "]"))
+           LazySeq
+           (var-type->str [variable] (str "[" (-> variable first name) "]"))
+           List
+           (var-type->str [variable] (str "[" (-> variable first name) "]"))
+           Keyword
+           (var-type->str [variable] (name variable))))
+
+
 (defn variables->str
   "Given a vector of variable maps, formats them and concatenates to string.
 
   E.g. (variables->str [{:variable/name \"id\" :variable/type :Int}]) => \"$id: Int\""
   [variables]
   (->> (for [{var-name :variable/name var-type :variable/type var-default :variable/default} variables]
-         (str "$" var-name ":" (name var-type) (when var-default (str "=" (arg->str var-default)))))
+         (str "$" var-name ":" (var-type->str var-type) (when var-default (str "=" (arg->str var-default)))))
        (interpose ",")
        (apply str)))
 
