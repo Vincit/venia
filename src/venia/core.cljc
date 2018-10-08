@@ -2,7 +2,8 @@
   (:require [venia.spec :as spec]
             [clojure.string :as str])
   #?(:clj
-     (:import (clojure.lang IPersistentMap Keyword IPersistentCollection))))
+     (:import (clojure.lang IPersistentMap Keyword IPersistentCollection)
+              (java.util UUID))))
 
 (defprotocol ArgumentFormatter
   "Protocol responsible for query arguments' formatting to string.
@@ -30,6 +31,8 @@
           (arg->str [arg] "null")
           String
           (arg->str [arg] (str "\"" arg "\""))
+          UUID
+          (arg->str [arg] (str "\"" arg "\""))
           IPersistentMap
           (arg->str [arg] (str "{" (arguments->str arg) "}"))
           IPersistentCollection
@@ -43,6 +46,8 @@
            nil
            (arg->str [arg] "null")
            string
+           (arg->str [arg] (str "\"" arg "\""))
+           UUID
            (arg->str [arg] (str "\"" arg "\""))
            PersistentArrayMap
            (arg->str [arg] (str "{" (arguments->str arg) "}"))
