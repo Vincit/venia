@@ -98,6 +98,12 @@
           query-str "{employee(id:1,active:true){name,address,friends(id:1){name,email}}}"]
       (is (= query-str (v/graphql-query data)))))
 
+  (testing "Should serialize uuids to strings"
+    (let [data {:venia/queries [[:employee {:id #uuid "db60501e-26c0-43d0-a4d8-21bd401acf6b"}
+                                 [:name]]]}
+          query-str "{employee(id:\"db60501e-26c0-43d0-a4d8-21bd401acf6b\"){name}}"]
+      (is (= query-str (v/graphql-query data)))))
+
   (testing "Should create a valid graphql string using params on fields."
     (let [data {:venia/queries [[:employee [[:name {:isEmpty false}] :address [:friends [:name [:email {:isValid true}]]]]]]}
           query-str "{employee{name(isEmpty:false),address,friends{name,email(isValid:true)}}}"]
