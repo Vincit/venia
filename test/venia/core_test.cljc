@@ -3,7 +3,9 @@
             [venia.core :as v]
     #?(:cljs [cljs.test :refer-macros [is are deftest testing]]
        :clj
-            [clojure.test :refer :all])))
+            [clojure.test :refer :all]))
+  #?(:clj
+     (:import (java.util UUID))))
 
 (deftest ArgumentFormatter-test
   (is (= "null" (v/arg->str nil)))
@@ -15,6 +17,17 @@
   (is (= "human" (v/arg->str :human)))
   (is (= "1" (v/arg->str 1)))
   (is (= "{active:true}" (v/arg->str {:active true})))
+
+  ;; unix timestamp conversion verified using https://www.unixtimestamp.com/index.php
+  (is (= (v/arg->str #inst"2018-12-10T00:00:00.000-00:00")
+         1544400000))
+
+  ; UUID only in clj
+  #?(:clj
+     (let [uuid-str "0bb88041-b83c-4669-b993-f22ca741312a"]
+       (is (= (v/arg->str (UUID/fromString uuid-str))
+              uuid-str))))
+
   (let [value (hash-map :a 0 :b 1 :c 2)
         output (v/arg->str value)]
     (is (and (string/starts-with? output "{")

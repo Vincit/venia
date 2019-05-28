@@ -2,7 +2,8 @@
   (:require [venia.spec :as spec]
             [clojure.string :as str])
   #?(:clj
-     (:import (clojure.lang IPersistentMap Keyword IPersistentCollection))))
+     (:import (clojure.lang IPersistentMap Keyword IPersistentCollection)
+              (java.util UUID Date))))
 
 (defprotocol ArgumentFormatter
   "Protocol responsible for query arguments' formatting to string.
@@ -37,7 +38,13 @@
           Keyword
           (arg->str [arg] (name arg))
           Object
-          (arg->str [arg] (str arg))))
+          (arg->str [arg] (str arg))
+          UUID
+          (arg->str [arg] (str arg))
+          Date
+          ;; convert to unix timestamp
+          (arg->str [arg] (-> (.getTime arg) (quot 1000)))))
+
 
 #?(:cljs (extend-protocol ArgumentFormatter
            nil
@@ -58,6 +65,9 @@
            (arg->str [arg] (sequential->str arg))
            Keyword
            (arg->str [arg] (name arg))
+           js/Date
+           ;; convert to unix timestamp
+           (arg->str [arg] (-> (.getTime arg) (quot 1000)))
            number
            (arg->str [arg] (str arg))
            object
