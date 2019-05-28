@@ -211,3 +211,18 @@
   [data]
   (-> (spec/query->spec data)
       ->query-str))
+
+(defn on
+  "To be able to construct union types like
+
+  source {
+    ...on isource {type}
+  }
+
+  Written in Clojure
+  [:source
+    [(on :isource [:type])]]
+
+  See: https://github.com/Vincit/venia/issues/34"
+  [type fields]
+  [(keyword (str "... on " (name type))) fields])
