@@ -88,7 +88,7 @@
           query-str "{employee(id:1,active:true){name,address,__typename,friends{__typename,name,email}}}"]
       (is (= query-str (v/graphql-query data)))))
 
-  (testing "Should create a valid graphql string using params on nested fields that doesnt't have nested fields."
+  (testing "Should create a valid graphql string using params on nested fields that doesn't have nested fields."
     (let [data {:venia/queries [[:employee {:id 1 :active true} [:name :address [:boss_name {:id 1}]]]]}
           query-str "{employee(id:1,active:true){name,address,boss_name(id:1)}}"]
       (is (= query-str (v/graphql-query data)))))
