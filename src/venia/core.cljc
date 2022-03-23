@@ -50,6 +50,8 @@
            (arg->str [arg] (str "{" (arguments->str arg) "}"))
            PersistentVector
            (arg->str [arg] (sequential->str arg))
+           ChunkedSeq
+           (arg->str [arg] (sequential->str arg))
            IndexedSeq
            (arg->str [arg] (sequential->str arg))
            LazySeq
